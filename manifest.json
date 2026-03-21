@@ -1,4 +1,5 @@
 {
+  "id": "/ayo-olopon/",
   "name": "Ayo Olopon",
   "short_name": "Ayo",
   "description": "Traditional Yoruba board game — rise through titles to become Oba",
@@ -7,7 +8,20 @@
   "orientation": "portrait-primary",
   "background_color": "#0b0400",
   "theme_color": "#c9941e",
+  "categories": ["games", "entertainment", "education"],
   "icons": [
-    { "src": "icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any maskable" }
+    { "src": "icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" },
+    { "src": "icon.svg",     "sizes": "any",     "type": "image/svg+xml" }
+  ],
+  "screenshots": [
+    {
+      "src": "icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "form_factor": "narrow",
+      "label": "Ayo Olopon game board"
+    }
   ]
 }
