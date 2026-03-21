@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <rect width="512" height="512" rx="90" fill="#170b00"/>
+  <!-- Board -->
+  <rect x="64" y="196" width="384" height="160" rx="24" fill="#3b1c07" stroke="#c9941e" stroke-width="6"/>
+  <!-- 6 pits top row -->
+  <circle cx="108" cy="236" r="22" fill="#0d0400" stroke="#6a3c18" stroke-width="3"/>
+  <circle cx="172" cy="236" r="22" fill="#0d0400" stroke="#6a3c18" stroke-width="3"/>
+  <circle cx="236" cy="236" r="22" fill="#0d0400" stroke="#6a3c18" stroke-width="3"/>
+  <circle cx="300" cy="236" r="22" fill="#0d0400" stroke="#6a3c18" stroke-width="3"/>
+  <circle cx="364" cy="236" r="22" fill="#0d0400" stroke="#6a3c18" stroke-width="3"/>
+  <circle cx="428" cy="236" r="22" fill="#0d0400" stroke="#6a3c18" stroke-width="3"/>
+  <!-- 6 pits bottom row -->
+  <circle cx="108" cy="316" r="22" fill="#0d0400" stroke="#6a3c18" stroke-width="3"/>
+  <circle cx="172" cy="316" r="22" fill="#0d0400" stroke="#6a3c18" stroke-width="3"/>
+  <circle cx="236" cy="316" r="22" fill="#0d0400" stroke="#6a3c18" stroke-width="3"/>
+  <circle cx="300" cy="316" r="22" fill="#0d0400" stroke="#6a3c18" stroke-width="3"/>
+  <circle cx="364" cy="316" r="22" fill="#0d0400" stroke="#6a3c18" stroke-width="3"/>
+  <circle cx="428" cy="316" r="22" fill="#0d0400" stroke="#6a3c18" stroke-width="3"/>
+  <!-- Seeds (dots) in a few pits -->
+  <circle cx="108" cy="236" r="5" fill="#c9941e"/>
+  <circle cx="172" cy="236" r="5" fill="#c9941e"/>
+  <circle cx="300" cy="316" r="5" fill="#c9941e"/>
+  <!-- Crown above board -->
+  <polygon points="256,60 200,130 256,105 312,130" fill="#c9941e"/>
+  <rect x="188" y="128" width="136" height="28" rx="6" fill="#c9941e"/>
+  <!-- Crown gems -->
+  <circle cx="256" cy="72" r="8" fill="#f0b429"/>
+  <circle cx="200" cy="122" r="6" fill="#f0b429"/>
+  <circle cx="312" cy="122" r="6" fill="#f0b429"/>
+</svg>
