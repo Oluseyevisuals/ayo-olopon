@@ -587,7 +587,7 @@ function showFact() {
 
   // Auto-hide after 4.5 seconds
   if (factTimer) clearTimeout(factTimer);
-  factTimer = setTimeout(() => toast.classList.add('hidden'), 8000);
+  factTimer = setTimeout(() => toast.classList.add('hidden'), 12000);
 }
 
 // ────────────────────────────────────────────────────────────────────
@@ -608,16 +608,48 @@ function updateBackground() {
 // ────────────────────────────────────────────────────────────────────
 // Yoruba voice narration (Web Speech API)
 // ────────────────────────────────────────────────────────────────────
+
+// Pre-load the voice list (browsers load it asynchronously)
+if (window.speechSynthesis) {
+  speechSynthesis.getVoices();
+  speechSynthesis.onvoiceschanged = () => speechSynthesis.getVoices();
+}
+
+function getBestVoice() {
+  const voices = speechSynthesis.getVoices();
+  return (
+    // 1. Native Yoruba voice (rare but ideal)
+    voices.find(v => v.lang.startsWith('yo'))                    ||
+    // 2. Nigerian English accent
+    voices.find(v => v.lang === 'en-NG')                         ||
+    // 3. Any voice whose name mentions Nigeria
+    voices.find(v => /nigeria/i.test(v.name))                    ||
+    // 4. South African or West African English as fallback
+    voices.find(v => v.lang === 'en-ZA')                         ||
+    // 5. Any English voice
+    voices.find(v => v.lang.startsWith('en'))                    ||
+    null
+  );
+}
+
 function speakTitle(titleName, meaning) {
   if (!window.speechSynthesis) return;
-  // Brief pause then announce
   setTimeout(() => {
-    const msg = new SpeechSynthesisUtterance(
-      `Congratulations! You have risen to ${titleName} — ${meaning}!`
-    );
-    msg.rate  = 0.88;
-    msg.pitch = 1.05;
-    msg.volume = 0.9;
+    const voice = getBestVoice();
+
+    // "E kú ìgbéga" = Yoruba for "Congratulations on your rise/promotion"
+    const text = `E ku igbega! You have risen to ${titleName} — ${meaning}!`;
+
+    const msg  = new SpeechSynthesisUtterance(text);
+    if (voice) {
+      msg.voice = voice;
+      msg.lang  = voice.lang;
+    } else {
+      msg.lang  = 'en-NG'; // request Nigerian English even if voice not found
+    }
+    msg.rate   = 0.82;   // slightly slower — deliberate, regal pace
+    msg.pitch  = 1.12;   // slightly higher — warm, celebratory tone
+    msg.volume = 0.92;
     speechSynthesis.speak(msg);
   }, 800);
 }
