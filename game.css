@@ -17,9 +17,10 @@
   --r:         16px;
 }
 
-html, body { width:100%; height:100%; overflow:hidden; background:var(--bg); color:var(--cream); font-family:'Inter',sans-serif; }
+html { width:100%; height:100%; height:100dvh; overflow:hidden; background:var(--bg); color:var(--cream); font-family:'Inter',sans-serif; }
+body { width:100%; height:100%; height:100dvh; overflow:hidden; background:var(--bg); color:var(--cream); font-family:'Inter',sans-serif; }
 
-#app { position:relative; width:100%; max-width:480px; height:100vh; margin:0 auto; overflow:hidden; }
+#app { position:relative; width:100%; max-width:480px; height:100vh; height:100dvh; margin:0 auto; overflow:hidden; }
 
 .screen { position:absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center; }
 .hidden { display:none !important; }
