@@ -1015,12 +1015,14 @@ function showGameOver(playerWon, tie) {
       SFX.titleUnlock(); Haptic.unlock();
       speakTitle(newT.name, newT.meaning);
       updateBackground();
-      sub = `You've risen to: ${newT.name}!`;
+      sub = `You've risen to: ${newT.name}! Play again to defend your new title! 💪`;
     } else if (titleIdx === TITLES.length - 1) {
-      sub = 'You reign supreme, Oba! 👑';
+      sub = 'You reign supreme, Oba! 👑 Play again to prove your dominance!';
     } else {
       const remaining = title.wins - titleWins;
-      sub = `${remaining} more win${remaining !== 1 ? 's' : ''} to become ${TITLES[titleIdx + 1].name}`;
+      sub = remaining === 1
+        ? `Just 1 more win and you become ${TITLES[titleIdx + 1].name}! You're so close! 🔥`
+        : `${remaining} more wins to become ${TITLES[titleIdx + 1].name} — keep going! 💪`;
     }
   } else if (gameMode !== '2p') {
     currentStreak = 0;
