@@ -412,7 +412,7 @@ kbd {
 .result-emoji { font-size:64px; animation:pop .5s cubic-bezier(.36,.07,.19,.97); }
 @keyframes pop { 0%{transform:scale(0);} 70%{transform:scale(1.2);} 100%{transform:scale(1);} }
 .gameover-body h2 { font-family:'Cinzel',serif; font-size:1.7rem; color:var(--gold-lt); }
-#result-sub { font-size:.82rem; color:var(--dim); }
+#result-sub { font-size:.82rem; color:var(--dim); white-space:pre-line; }
 
 .title-unlocked {
   display:flex; flex-direction:column; align-items:center; gap:3px;

@@ -1045,7 +1045,8 @@ function showGameOver(playerWon, tie) {
     }
   }
 
-  document.getElementById('result-sub').textContent = sub;
+  document.getElementById('result-sub').textContent =
+    playerWon && !tie ? sub + '\n🥂 You deserve a bowl of Palmie (Palmwine)!' : sub;
   SFX.ambientStop();
   showScreen('gameover-screen');
 
