@@ -1,5 +1,5 @@
 // Ayo Olopon — Service Worker
-const CACHE = 'ayo-v1';
+const CACHE = 'ayo-v2';
 const LOCAL_ASSETS = [
   './',
   './index.html',
