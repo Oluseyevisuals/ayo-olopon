@@ -255,6 +255,17 @@ function spawnParticles(pitEl, count) {
   }
 }
 
+function showMoveEmoji(pitEl, emoji) {
+  const rect = pitEl.getBoundingClientRect();
+  const el = document.createElement('div');
+  el.className = 'move-emoji';
+  el.textContent = emoji;
+  el.style.left = (rect.left + rect.width / 2) + 'px';
+  el.style.top  = (rect.top  + rect.height / 2) + 'px';
+  document.body.appendChild(el);
+  el.addEventListener('animationend', () => el.remove(), { once: true });
+}
+
 // ────────────────────────────────────────────────────────────────────
 // Undo
 // ────────────────────────────────────────────────────────────────────
@@ -804,6 +815,17 @@ function executeMove(pitIdx, player, onDone) {
         spawnParticles(el, 5 + Math.floor(Math.random() * 4)); // 5–8 seeds per pit
       }
     });
+
+    // Emoji reaction on landing pit
+    const landingEl = document.getElementById(`pit-${landingPit}`);
+    if (landingEl) {
+      let emoji;
+      const totalCaptured = capturedPits.reduce((s, p) => s + (board[p] || 0), 0);
+      if (capturedPits.length === 0)        emoji = player === PLAYER ? '👏' : '🤖';
+      else if (totalCaptured >= 6)           emoji = '🔥';
+      else                                   emoji = player === PLAYER ? '⚡' : '😤';
+      showMoveEmoji(landingEl, emoji);
+    }
 
     for (let i = 0; i < 12; i++) refreshPit(i);
     updateScores();
