@@ -218,6 +218,28 @@ function setDifficulty(d) {
   try { localStorage.setItem('ayo_difficulty', d); } catch(e) {}
 }
 
+const WOOD_THEMES = {
+  mahogany: { wood:'#3b1c07', wood2:'#5a2c0e', board1:'#3d1f09', board2:'#5c2e10', pitBg:'#1a0800', pitBdr:'#6a3c18' },
+  teak:     { wood:'#5a3010', wood2:'#7a4820', board1:'#604020', board2:'#7a5230', pitBg:'#2a1408', pitBdr:'#906030' },
+  ebony:    { wood:'#141008', wood2:'#201810', board1:'#161008', board2:'#241a0c', pitBg:'#080404', pitBdr:'#382818' },
+  rosewood: { wood:'#3a1408', wood2:'#5a2010', board1:'#3c1408', board2:'#5c2216', pitBg:'#180600', pitBdr:'#6a2018' },
+};
+
+function setWood(theme) {
+  const t = WOOD_THEMES[theme]; if (!t) return;
+  const r = document.documentElement.style;
+  r.setProperty('--wood',   t.wood);
+  r.setProperty('--wood2',  t.wood2);
+  r.setProperty('--board1', t.board1);
+  r.setProperty('--board2', t.board2);
+  r.setProperty('--pit-bg', t.pitBg);
+  r.setProperty('--pit-bdr',t.pitBdr);
+  document.querySelectorAll('.wood-btn').forEach(b => b.classList.remove('active'));
+  const btn = document.getElementById('wood-' + theme);
+  if (btn) btn.classList.add('active');
+  try { localStorage.setItem('ayo_wood', theme); } catch(e) {}
+}
+
 function getAIDepth() {
   const base = TITLES[titleIdx].depth;
   if (difficulty === 'easy') return Math.min(base, 2);
@@ -1105,6 +1127,8 @@ function loadProgress() {
     const ss = parseInt(localStorage.getItem('ayo_seeds'), 10);
     if (!isNaN(ss) && ss >= 0) totalSeeds    = ss;
     if (d === 'easy' || d === 'medium' || d === 'hard') difficulty = d;
+    const wood = localStorage.getItem('ayo_wood');
+    if (wood && WOOD_THEMES[wood]) setWood(wood);
   } catch(e) {}
 }
 
