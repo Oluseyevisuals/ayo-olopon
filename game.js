@@ -448,6 +448,10 @@ function highlightValidMoves() {
 }
 
 function showHint() {
+  if (!isHintUnlockedToday()) {
+    showToast('💡 Complete today\'s Daily Challenge on the main menu to unlock hints!');
+    return;
+  }
   if (gameMode === '2p' || busy || over || turn !== PLAYER) return;
   const hintPit = bestPlayerMove(3);
   if (hintPit === -1) return;
@@ -511,6 +515,7 @@ function startGame() {
   document.getElementById('fs-lbl-player').textContent = is2p ? 'P1' : 'You';
   document.getElementById('fs-lbl-ai').textContent     = is2p ? 'P2' : 'AI';
   document.getElementById('btn-hint').style.display   = is2p ? 'none' : '';
+  updateHintButton();
   document.getElementById('pit-labels').style.display = is2p ? 'none' : '';
 
   renderBoard();
@@ -1278,6 +1283,133 @@ document.addEventListener('keydown', e => {
 });
 
 // ────────────────────────────────────────────────────────────────────
+// Daily Challenge
+// ────────────────────────────────────────────────────────────────────
+const DAILY_QUESTIONS = [
+  { q:'Who is considered the founding ancestor of the Yoruba people?', options:['Oduduwa','Obatala','Oranmiyan'], answer:0, exp:'Oduduwa descended from the heavens on a chain at Ile-Ife and is revered as the progenitor of all Yoruba kingdoms.' },
+  { q:'What city is regarded as the cradle of Yoruba civilisation?', options:['Ibadan','Ile-Ife','Oyo-Ile'], answer:1, exp:'Ile-Ife (meaning "house of expansion") is the sacred city where Oduduwa descended and created the earth.' },
+  { q:'Who founded the Old Oyo Empire?', options:['Sango','Afonja','Oranmiyan'], answer:2, exp:'Oranmiyan, grandson of Oduduwa, founded the Old Oyo Empire and is also credited with founding Benin City.' },
+  { q:'What does the Yoruba word "Ayo" mean?', options:['Board','Joy','Victory'], answer:1, exp:'Ayo means Joy in Yoruba — the game was played at festivals and celebrations to spread happiness.' },
+  { q:'Which Yoruba deity is the god of iron, hunting and war?', options:['Sango','Ogun','Eshu'], answer:1, exp:'Ogun is the powerful deity of iron and war. Blacksmiths, soldiers and drivers swear oaths on Ogun.' },
+  { q:'Which deity rules thunder and lightning in Yoruba belief?', options:['Sango','Obatala','Orunmila'], answer:0, exp:'Sango was a historical king of Oyo who was deified after death and became the god of thunder and lightning.' },
+  { q:'The Osun-Osogbo festival celebrates which river goddess?', options:['Yemoja','Oya','Osun'], answer:2, exp:'Osun is the goddess of the sacred Osun River. The Osun-Osogbo festival is a UNESCO Intangible Cultural Heritage.' },
+  { q:'Who was the Yoruba heroine who sacrificed her son to save her people?', options:['Emotan','Moremi Ajasoro','Queen Amina'], answer:1, exp:'Moremi Ajasoro of Ile-Ife allowed herself to be captured by the Ugbo people to learn their secrets, then sacrificed her only son Ela as promised to the river goddess.' },
+  { q:'What is "Ifa" in Yoruba tradition?', options:['A royal drum','A divination system and body of sacred knowledge','A type of crown'], answer:1, exp:'Ifa is a vast divination system and oral literary corpus recognised by UNESCO. Priests called Babalawo interpret its 256 chapters called Odu.' },
+  { q:'The title "Ooni" belongs to the traditional ruler of which city?', options:['Oyo','Ibadan','Ile-Ife'], answer:2, exp:'The Ooni of Ife is one of the most revered traditional rulers in Yoruba land, regarded as the spiritual head of the Yoruba people.' },
+  { q:'What does "Olopon" mean in Yoruba?', options:['Sacred calabash','The wooden board used for Ayo','A royal crown'], answer:1, exp:'"Olopon" refers to the wooden board used to play Ayo — so Ayo Olopon means "the Ayo board game."' },
+  { q:'What military weapon made the Old Oyo Empire the most powerful in West Africa?', options:['War canoes','Cavalry (horse warriors)','Iron cannons'], answer:1, exp:'Oyo built one of the largest cavalry forces in West African history, allowing it to dominate a vast territory from the 17th to 18th century.' },
+  { q:'The Egungun masquerade in Yoruba culture represents what?', options:['Forest spirits','The spirits of ancestors','Water deities'], answer:1, exp:'Egungun masquerades are believed to be the physical manifestation of ancestral spirits returning to the world of the living to guide and protect their descendants.' },
+  { q:'What does the Yoruba concept of "Ori" mean?', options:['Personal destiny and inner spirit','A type of king','A sacred river'], answer:0, exp:'Ori literally means "head" but spiritually represents personal destiny chosen before birth. Yoruba believe worshipping one\'s Ori is essential to achieving one\'s purpose.' },
+  { q:'Which UNESCO World Heritage Site is located in Yoruba land?', options:['Sukur Cultural Landscape','Kano Old City','Osun-Osogbo Sacred Grove'], answer:2, exp:'The Osun-Osogbo Sacred Grove is one of the last remnants of primary forest in southern Nigeria and a UNESCO World Heritage Site since 2005.' },
+  { q:'What is the significance of twins (Ibeji) in Yoruba culture?', options:['They are considered bad omens','They are sacred and believed to bring fortune','They must be separated at birth'], answer:1, exp:'Yoruba people have one of the highest twin birth rates in the world. Twins are considered sacred children of Sango and are believed to bring blessings to the family.' },
+  { q:'The Gelede masquerade honours which group in Yoruba society?', options:['Warriors and hunters','Women, mothers and female ancestors','Kings and chiefs'], answer:1, exp:'Gelede is performed to honour the power of women, especially elderly women and female ancestors known as "the mothers." It is a UNESCO Intangible Heritage.' },
+  { q:'Which Yoruba god is the divine trickster and guardian of crossroads?', options:['Sango','Obatala','Eshu/Elegba'], answer:2, exp:'Eshu (also called Elegba or Elegua) is the divine messenger between humans and gods. No ritual begins without first honouring Eshu to ensure safe passage.' },
+  { q:'Yemoja is the Yoruba goddess of what?', options:['The harvest','Rivers and motherhood','Thunder'], answer:1, exp:'Yemoja is the mother of waters and protector of women and children. Her worship spread across the Atlantic with the Yoruba diaspora to Brazil and Cuba.' },
+  { q:'The Alaafin is the traditional ruler of which Yoruba kingdom?', options:['Lagos','Ekiti','Oyo'], answer:2, exp:'The Alaafin of Oyo was historically the most powerful Yoruba ruler, commanding the vast Old Oyo Empire and its renowned cavalry.' },
+  { q:'The city of Abeokuta is built around which famous natural feature?', options:['Olumo Rock','A sacred waterfall','A volcanic crater'], answer:0, exp:'Olumo Rock served as a fortress for the Egba people during the inter-tribal wars of the 19th century. "Abeokuta" means "under the rock."' },
+  { q:'What is "Adire" in Yoruba culture?', options:['A royal war chant','Traditional indigo tie-dye fabric','A ceremonial calabash'], answer:1, exp:'Adire is a beautiful indigo-dyed cloth made using tie-dye and starch-resist techniques. It is one of the most celebrated traditional crafts of the Egba Yoruba.' },
+  { q:'Which Egba hero led the revolt for Egba independence from Old Oyo?', options:['Afonja','Lisabi','Kurunmi'], answer:1, exp:'Lisabi Agbongbo Akala organised the Egba people\'s uprising against Oyo oppression around 1774, liberating the Egba from Oyo\'s tributary demands.' },
+  { q:'How many days are in a traditional Yoruba week?', options:['7 days','5 days','4 days'], answer:2, exp:'The traditional Yoruba week has 4 days — Ojo Awo, Ojо Ogun, Ojо Sango, and Ojо Obatala — each associated with a specific deity.' },
+  { q:'Obatala is the Yoruba deity associated with what?', options:['Purity, wisdom and creation of human bodies','Fire and destruction','The ocean and deep waters'], answer:0, exp:'Obatala (also called Orisa-nla) is the deity of creation, purity and calm. Yoruba believe Olodumare gave Obatala the task of moulding human bodies from clay.' },
+  { q:'What is the name of the Yoruba divination priest?', options:['Babalawo','Oba','Balogun'], answer:0, exp:'A Babalawo ("father of secrets") is a trained Ifa divination priest who studies for years to memorise the 256 Odu chapters of Ifa wisdom.' },
+  { q:'The ancient Ife bronze heads discovered in Ile-Ife are significant because?', options:['They are the oldest known artworks in Africa','They show Yoruba mastery of naturalistic bronze casting centuries ago','They were made by Portuguese traders'], answer:1, exp:'The Ife bronze heads (c. 12th–14th century) display extraordinary naturalistic detail that astonished the world when first discovered, proving advanced Yoruba artistry.' },
+  { q:'In which century did the Old Oyo Empire reach its peak of power?', options:['10th–11th century','14th–15th century','17th–18th century'], answer:2, exp:'The Old Oyo Empire reached its height of power in the 17th and 18th centuries, controlling a vast territory and conducting trade across West Africa.' },
+  { q:'What is the name of the Yoruba oral literature tradition recognised by UNESCO?', options:['Ifa literary corpus','Egungun songs','Gelede chants'], answer:0, exp:'The Ifa literary corpus was inscribed on UNESCO\'s Representative List of Intangible Cultural Heritage in 2008. It contains the history, philosophy and medicine of the Yoruba.' },
+  { q:'Which Yoruba kingdom controlled the trade routes between the coast and the interior of Nigeria?', options:['Ijebu kingdom','Ekiti kingdom','Ondo kingdom'], answer:0, exp:'The Ijebu kingdom, ruled by the Awujale, controlled strategic trade routes and became extremely wealthy. They were known for their military strength and resistance to foreign interference.' },
+  { q:'What does the name "Ibadan" roughly translate to?', options:['City of warriors','Near the forest by the open plain','Home of the river'], answer:1, exp:'Ibadan comes from "Eba Odan" meaning "near the forest by the open savanna." It was founded in the 1820s and grew rapidly to become the largest city in sub-Saharan Africa by the late 1800s.' },
+  { q:'The Yoruba diaspora in Brazil practise a religion based on Yoruba beliefs called?', options:['Vodou','Santería','Candomblé'], answer:2, exp:'Candomblé in Brazil is directly descended from Yoruba religious practices brought by enslaved Yoruba people. The orishas are still worshipped under their Yoruba names.' },
+  { q:'What does "Oba" mean in Yoruba?', options:['Elder','King or Ruler','Warrior chief'], answer:1, exp:'Oba means King in Yoruba. It is the highest traditional title, used for rulers of major Yoruba cities and kingdoms.' },
+  { q:'Which river flows through the sacred Osun-Osogbo grove?', options:['Niger River','Ogun River','Osun River'], answer:2, exp:'The Osun River flows through the sacred grove at Osogbo. The river is believed to be the physical embodiment of the goddess Osun herself.' },
+  { q:'The Yoruba architectural style of a royal palace is called?', options:['Afin','Ile-Oba','Agbo-ile'], answer:0, exp:'An Afin is the palace complex of a Yoruba Oba. The great Afin of Oyo was one of the largest palace complexes in West Africa.' },
+];
+
+function todayKey() {
+  const d = new Date();
+  return `${d.getFullYear()}-${d.getMonth()+1}-${d.getDate()}`;
+}
+
+function getDailyQuestion() {
+  // Use date as deterministic index
+  const d = new Date();
+  const dayOfYear = Math.floor((d - new Date(d.getFullYear(), 0, 0)) / 86400000);
+  return DAILY_QUESTIONS[dayOfYear % DAILY_QUESTIONS.length];
+}
+
+function isHintUnlockedToday() {
+  try { return localStorage.getItem('ayo_daily_date') === todayKey() && localStorage.getItem('ayo_daily_correct') === '1'; } catch(e) { return false; }
+}
+
+function initDailyChallenge() {
+  const q = getDailyQuestion();
+  const todayDone = (() => { try { return localStorage.getItem('ayo_daily_date') === todayKey(); } catch(e) { return false; } })();
+
+  const badge   = document.getElementById('daily-badge');
+  const qWrap   = document.getElementById('daily-question-wrap');
+  const doneMsg = document.getElementById('daily-done-msg');
+
+  if (todayDone) {
+    qWrap.classList.add('hidden');
+    doneMsg.classList.remove('hidden');
+    if (isHintUnlockedToday()) badge.classList.remove('hidden');
+  } else {
+    document.getElementById('daily-q').textContent = q.q;
+    const optsEl = document.getElementById('daily-options');
+    optsEl.innerHTML = '';
+    q.options.forEach((opt, i) => {
+      const btn = document.createElement('button');
+      btn.className = 'daily-opt';
+      btn.textContent = opt;
+      btn.onclick = () => answerDaily(i, q);
+      optsEl.appendChild(btn);
+    });
+  }
+  updateHintButton();
+}
+
+function answerDaily(chosen, q) {
+  const opts = document.querySelectorAll('.daily-opt');
+  opts.forEach((btn, i) => {
+    btn.onclick = null;
+    if (i === q.answer) btn.classList.add('correct');
+    else if (i === chosen) btn.classList.add('wrong');
+  });
+
+  const feedback = document.getElementById('daily-feedback');
+  feedback.textContent = q.exp;
+  feedback.classList.remove('hidden');
+
+  const correct = chosen === q.answer;
+  try {
+    localStorage.setItem('ayo_daily_date',    todayKey());
+    localStorage.setItem('ayo_daily_correct', correct ? '1' : '0');
+  } catch(e) {}
+
+  setTimeout(() => {
+    document.getElementById('daily-question-wrap').classList.add('hidden');
+    document.getElementById('daily-done-msg').classList.remove('hidden');
+    if (correct) {
+      document.getElementById('daily-badge').classList.remove('hidden');
+      showToast('🎉 Correct! Hint button unlocked for today!');
+    } else {
+      showToast('Not quite — read the answer and try again tomorrow.');
+    }
+    updateHintButton();
+  }, 2800);
+}
+
+function updateHintButton() {
+  const btn = document.getElementById('btn-hint');
+  if (!btn) return;
+  if (isHintUnlockedToday()) {
+    btn.classList.remove('locked');
+    btn.title = '';
+  } else {
+    btn.classList.add('locked');
+    btn.title = 'Complete today\'s Daily Challenge to unlock the hint';
+  }
+}
+
+// ────────────────────────────────────────────────────────────────────
 // Offline detection
 // ────────────────────────────────────────────────────────────────────
 const offlineOverlay = document.getElementById('offline-overlay');
@@ -1332,3 +1464,4 @@ function dismissRate() {
 // ────────────────────────────────────────────────────────────────────
 loadProgress();
 init();
+initDailyChallenge();

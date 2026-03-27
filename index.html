@@ -71,6 +71,21 @@
         <button id="btn-play" onclick="startGameMode('ai')">▶ &nbsp;vs AI</button>
         <button class="btn-outline btn-2p" onclick="startGameMode('2p')">👥 2 Players</button>
       </div>
+      <!-- Daily Challenge -->
+      <div id="daily-challenge" class="daily-challenge">
+        <div class="daily-header">
+          <span class="daily-icon">📅</span>
+          <span class="daily-title">Daily Challenge</span>
+          <span id="daily-badge" class="daily-badge hidden">✅ Hint Unlocked</span>
+        </div>
+        <div id="daily-question-wrap">
+          <p id="daily-q" class="daily-q"></p>
+          <div id="daily-options" class="daily-options"></div>
+          <p id="daily-feedback" class="daily-feedback hidden"></p>
+        </div>
+        <p id="daily-done-msg" class="daily-done-msg hidden">Come back tomorrow for a new challenge!</p>
+      </div>
+
       <div class="title-links">
         <button class="btn-link" onclick="showScreen('rules-screen')">How to Play</button>
         <span class="link-sep">·</span>

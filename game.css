@@ -103,6 +103,8 @@ button:active { transform:translateY(0); }
   padding:8px 14px; font-size:.8rem; box-shadow:none;
 }
 .btn-hint:hover { transform:none; box-shadow:none; border-color:var(--gold); }
+.btn-hint.locked { color:var(--dim); border-color:rgba(106,60,24,.3); cursor:not-allowed; opacity:.5; }
+.btn-hint.locked:hover { border-color:rgba(106,60,24,.3); }
 .btn-undo {
   background:transparent; color:var(--dim); border:1px solid rgba(106,60,24,.45);
   padding:8px 14px; font-size:.8rem; box-shadow:none;
@@ -183,6 +185,28 @@ button:active { transform:translateY(0); }
 #wood-teak     { background:radial-gradient(circle at 35% 30%, #a06030, #5a3010); }
 #wood-ebony    { background:radial-gradient(circle at 35% 30%, #2a2018, #100c08); }
 #wood-rosewood { background:radial-gradient(circle at 35% 30%, #8a2818, #4a1408); }
+
+/* ── Daily Challenge ──────────────────────────────── */
+.daily-challenge {
+  width:100%; background:rgba(201,148,30,.07); border:1px solid rgba(201,148,30,.25);
+  border-radius:14px; padding:12px 14px; display:flex; flex-direction:column; gap:8px;
+}
+.daily-header { display:flex; align-items:center; gap:8px; }
+.daily-icon   { font-size:1rem; }
+.daily-title  { font-family:'Cinzel',serif; font-size:.75rem; color:var(--gold); font-weight:600; flex:1; letter-spacing:1px; text-transform:uppercase; }
+.daily-badge  { font-size:.65rem; color:#4caf50; background:rgba(76,175,80,.12); border:1px solid rgba(76,175,80,.3); border-radius:20px; padding:2px 8px; }
+.daily-q      { font-size:.8rem; color:var(--cream); line-height:1.5; text-align:center; }
+.daily-options { display:flex; flex-direction:column; gap:6px; }
+.daily-opt {
+  background:rgba(201,148,30,.08); border:1px solid rgba(201,148,30,.2);
+  border-radius:10px; padding:8px 12px; font-size:.78rem; color:var(--cream);
+  cursor:pointer; text-align:left; transition:background .15s, border-color .15s;
+}
+.daily-opt:hover  { background:rgba(201,148,30,.18); border-color:rgba(201,148,30,.5); }
+.daily-opt.correct { background:rgba(76,175,80,.2); border-color:#4caf50; color:#81c784; }
+.daily-opt.wrong   { background:rgba(220,60,60,.15); border-color:rgba(220,60,60,.4); color:rgba(242,224,192,.5); }
+.daily-feedback { font-size:.75rem; color:var(--dim); line-height:1.5; text-align:center; font-style:italic; }
+.daily-done-msg { font-size:.72rem; color:var(--dim); text-align:center; }
 
 /* ── Win / Loss stats ─────────────────────────────── */
 .stats-row { display:flex; align-items:center; gap:8px; font-size:.72rem; }
