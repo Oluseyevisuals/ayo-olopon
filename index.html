@@ -232,12 +232,34 @@
       </div>
 
       <button onclick="startGame()">Play Again</button>
+      <button id="btn-share" class="btn-outline" onclick="shareGame()" style="display:none">📲 Challenge a Friend</button>
       <button class="btn-outline" onclick="goToMenu()">Main Menu</button>
     </div>
     <div class="kente-bar bottom"></div>
   </div>
 
 </div><!-- #app -->
+
+<!-- Offline overlay -->
+<div id="offline-overlay" style="display:none;position:fixed;inset:0;background:#0b0400;z-index:9999;display:none;flex-direction:column;align-items:center;justify-content:center;gap:16px;padding:32px;text-align:center;">
+  <div style="font-size:52px">🌍</div>
+  <h2 style="font-family:'Cinzel',serif;color:#c9941e;font-size:1.5rem">You're Offline</h2>
+  <p style="color:#a07840;font-size:.9rem;line-height:1.6">No internet connection.<br>Your progress is saved — come back when you're connected.</p>
+  <p style="color:#6a4820;font-size:.75rem">Ayo Olopon • Traditional Yoruba Board Game</p>
+</div>
+
+<!-- Rate prompt -->
+<div id="rate-prompt" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:9998;align-items:center;justify-content:center;padding:24px;">
+  <div style="background:linear-gradient(160deg,#3d1f09,#5c2e10);border:1px solid rgba(201,148,30,.4);border-radius:20px;padding:28px 24px;max-width:320px;width:100%;text-align:center;display:flex;flex-direction:column;gap:14px;">
+    <div style="font-size:36px">⭐</div>
+    <h3 style="font-family:'Cinzel',serif;color:#f0b429;font-size:1.1rem">Enjoying Ayo Olopon?</h3>
+    <p style="color:#c8a878;font-size:.82rem;line-height:1.5">Help us spread Yoruba culture — leave a quick rating!</p>
+    <div style="display:flex;gap:10px;justify-content:center;">
+      <button onclick="rateApp()" style="background:linear-gradient(135deg,#c9941e,#9a6e0a);color:#0b0400;border:none;border-radius:50px;padding:10px 22px;font-family:'Cinzel',serif;font-size:.8rem;font-weight:700;cursor:pointer;">Rate Now ⭐</button>
+      <button onclick="dismissRate()" style="background:transparent;color:#a07840;border:1px solid rgba(106,60,24,.6);border-radius:50px;padding:10px 18px;font-size:.8rem;cursor:pointer;">Later</button>
+    </div>
+  </div>
+</div>
 <script src="game.js"></script>
 <script>
   if ('serviceWorker' in navigator) {

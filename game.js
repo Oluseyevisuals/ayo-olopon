@@ -997,6 +997,7 @@ function finishGameOver() {
 
 function showGameOver(playerWon, tie) {
   const is2p = gameMode === '2p';
+  document.getElementById('btn-share').style.display    = playerWon && !tie ? 'inline-flex' : 'none';
   document.getElementById('result-emoji').textContent   = tie ? '🤝' : '🏆';
   document.getElementById('result-heading').textContent = tie
     ? 'Draw!'
@@ -1073,6 +1074,7 @@ function showGameOver(playerWon, tie) {
     playerWon && !tie ? sub + '\n🥂 You deserve a bowl of Palmie (Palmwine)!' : sub;
   SFX.ambientStop();
   showScreen('gameover-screen');
+  if (!tie && !is2p) setTimeout(maybeShowRatePrompt, 1500);
 
   // Persist title progress (localStorage)
   saveProgress();
@@ -1274,6 +1276,56 @@ document.addEventListener('keydown', e => {
     case 'm': toggleMute(); break;
   }
 });
+
+// ────────────────────────────────────────────────────────────────────
+// Offline detection
+// ────────────────────────────────────────────────────────────────────
+const offlineOverlay = document.getElementById('offline-overlay');
+function updateOnlineStatus() {
+  if (!navigator.onLine) {
+    offlineOverlay.style.display = 'flex';
+  } else {
+    offlineOverlay.style.display = 'none';
+  }
+}
+window.addEventListener('offline', updateOnlineStatus);
+window.addEventListener('online',  updateOnlineStatus);
+
+// ────────────────────────────────────────────────────────────────────
+// Share
+// ────────────────────────────────────────────────────────────────────
+function shareGame() {
+  const text = 'I just won at Ayo Olopon! 🏆 Can you beat me? Play the traditional Yoruba board game:';
+  const url  = 'https://oluseyevisuals.github.io/ayo-olopon/';
+  if (navigator.share) {
+    navigator.share({ title: 'Ayo Olopon', text, url }).catch(() => {});
+  } else {
+    navigator.clipboard?.writeText(url).then(() => alert('Link copied! Share it with friends.'));
+  }
+}
+
+// ────────────────────────────────────────────────────────────────────
+// Rate prompt — show after every 3rd win
+// ────────────────────────────────────────────────────────────────────
+const STORE_URL = 'https://oluseyevisuals.github.io/ayo-olopon/';
+function maybeShowRatePrompt() {
+  try {
+    if (localStorage.getItem('ayo_rated')) return;
+    const dismissed = parseInt(localStorage.getItem('ayo_rate_dismissed') || '0', 10);
+    if (totalWins > 0 && totalWins % 3 === 0 && totalWins > dismissed) {
+      document.getElementById('rate-prompt').style.display = 'flex';
+    }
+  } catch(e) {}
+}
+function rateApp() {
+  try { localStorage.setItem('ayo_rated', '1'); } catch(e) {}
+  document.getElementById('rate-prompt').style.display = 'none';
+  window.open(STORE_URL, '_blank');
+}
+function dismissRate() {
+  try { localStorage.setItem('ayo_rate_dismissed', String(totalWins)); } catch(e) {}
+  document.getElementById('rate-prompt').style.display = 'none';
+}
 
 // ────────────────────────────────────────────────────────────────────
 // Boot
