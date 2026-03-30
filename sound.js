@@ -306,14 +306,15 @@ const SFX = (() => {
     const c = getCtx();
     const sustain = dur * FOLK_BEAT * 0.72;
     const release = dur * FOLK_BEAT * 0.22;
+    const end     = at + sustain + release;
 
-    // Warm triangle oscillator — flute/vocal character
+    // ── Flute timbre ─────────────────────────────────────────────
+    // Sine wave with gentle vibrato — warm, breathy flute character
     const osc  = c.createOscillator();
-    const gain = c.createGain();
-    osc.type = 'triangle';
+    osc.type = 'sine';
     osc.frequency.value = freq;
 
-    // Gentle vibrato (LFO → frequency)
+    // Gentle vibrato
     const lfo     = c.createOscillator();
     const lfoGain = c.createGain();
     lfo.type = 'sine';
@@ -322,17 +323,19 @@ const SFX = (() => {
     lfo.connect(lfoGain);
     lfoGain.connect(osc.frequency);
 
+    // Soft breath attack
+    const gain = c.createGain();
     gain.gain.setValueAtTime(0, at);
-    gain.gain.linearRampToValueAtTime(0.09, at + 0.07);
-    gain.gain.setValueAtTime(0.09, at + sustain);
-    gain.gain.exponentialRampToValueAtTime(0.001, at + sustain + release);
+    gain.gain.linearRampToValueAtTime(0.10, at + 0.06);
+    gain.gain.setValueAtTime(0.10, at + sustain);
+    gain.gain.exponentialRampToValueAtTime(0.001, end);
 
     osc.connect(gain);
     gain.connect(c.destination);
 
     lfo.start(at); osc.start(at);
-    lfo.stop(at + sustain + release + 0.05);
-    osc.stop(at + sustain + release + 0.05);
+    lfo.stop(end + 0.05);
+    osc.stop(end + 0.05);
   }
 
   function folkTick() {
