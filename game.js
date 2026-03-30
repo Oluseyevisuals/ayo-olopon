@@ -156,12 +156,86 @@ document.addEventListener('visibilitychange', () => {
   if (document.visibilityState === 'visible') requestWakeLock();
 });
 
-// ── Folk melody (real audio file) ──
+// ── Folk melody — real audio + studio processing chain ──────────────
 const _melody = new Audio('./meta-melody.mp4');
 _melody.loop = true;
-_melody.volume = 0.55;
+
+let _melodyCtx = null;
+
+function _buildMelodyChain() {
+  if (_melodyCtx) return;
+  _melodyCtx = new (window.AudioContext || window.webkitAudioContext)();
+  const c = _melodyCtx;
+
+  const src = c.createMediaElementSource(_melody);
+
+  // 1. High-pass — remove low-end rumble
+  const hp = c.createBiquadFilter();
+  hp.type = 'highpass';
+  hp.frequency.value = 90;
+
+  // 2. Low-mid cut — remove boxiness (~300 Hz)
+  const lowMid = c.createBiquadFilter();
+  lowMid.type = 'peaking';
+  lowMid.frequency.value = 320;
+  lowMid.gain.value = -4;
+  lowMid.Q.value = 1.2;
+
+  // 3. Presence boost — add clarity and warmth (~3 kHz)
+  const pres = c.createBiquadFilter();
+  pres.type = 'peaking';
+  pres.frequency.value = 3000;
+  pres.gain.value = 3;
+  pres.Q.value = 1.0;
+
+  // 4. Air shelf — open up the top end
+  const air = c.createBiquadFilter();
+  air.type = 'highshelf';
+  air.frequency.value = 8000;
+  air.gain.value = 3.5;
+
+  // 5. Dynamics compressor — glues it together, studio punch
+  const comp = c.createDynamicsCompressor();
+  comp.threshold.value = -22;
+  comp.knee.value = 8;
+  comp.ratio.value = 3.5;
+  comp.attack.value = 0.004;
+  comp.release.value = 0.22;
+
+  // 6. Output gain
+  const outGain = c.createGain();
+  outGain.gain.value = 0.78;
+
+  // 7. Room reverb — two short delays + feedback for natural space
+  const revDelay1 = c.createDelay(1.0); revDelay1.delayTime.value = 0.035;
+  const revDelay2 = c.createDelay(1.0); revDelay2.delayTime.value = 0.072;
+  const revDelay3 = c.createDelay(1.0); revDelay3.delayTime.value = 0.119;
+  const revFb1 = c.createGain(); revFb1.gain.value = 0.18;
+  const revFb2 = c.createGain(); revFb2.gain.value = 0.12;
+  const revFb3 = c.createGain(); revFb3.gain.value = 0.08;
+  const revWet = c.createGain(); revWet.gain.value = 0.28;
+
+  // Dry chain: src → hp → lowMid → pres → air → comp → outGain → dest
+  src.connect(hp);
+  hp.connect(lowMid);
+  lowMid.connect(pres);
+  pres.connect(air);
+  air.connect(comp);
+  comp.connect(outGain);
+  outGain.connect(c.destination);
+
+  // Reverb send from post-comp
+  comp.connect(revDelay1); revDelay1.connect(revFb1); revFb1.connect(revWet);
+  comp.connect(revDelay2); revDelay2.connect(revFb2); revFb2.connect(revWet);
+  comp.connect(revDelay3); revDelay3.connect(revFb3); revFb3.connect(revWet);
+  revWet.connect(c.destination);
+}
+
 function melodyPlay() {
-  if (!SFX.isMuted()) _melody.play().catch(() => {});
+  if (SFX.isMuted()) return;
+  _buildMelodyChain();
+  if (_melodyCtx && _melodyCtx.state === 'suspended') _melodyCtx.resume();
+  _melody.play().catch(() => {});
 }
 function melodyStop() {
   _melody.pause();
