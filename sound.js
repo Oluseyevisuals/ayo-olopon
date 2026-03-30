@@ -269,23 +269,32 @@ const SFX = (() => {
   // Synthesised as a warm flute/kalimba voice over the drum loop.
   // Uses G major pentatonic (G4·A4·B4·D5·E5·G5) — the natural scale
   // of Yoruba folk music. Tempo: 88 BPM, gentle vibrato, soft attack.
-  const FOLK_BPM   = 88;
-  const FOLK_BEAT  = 60 / FOLK_BPM;               // ≈ 0.682 s per beat
+  const FOLK_BPM   = 85;
+  const FOLK_BEAT  = 60 / FOLK_BPM;               // ≈ 0.706 s per beat
 
-  // [frequency_hz, duration_in_beats]
+  // Notes extracted from the original Mẹta mẹta l'ore o recording.
+  // Frequencies doubled one octave for a warm flute/kalimba timbre.
+  // [frequency_hz, duration_in_beats, 0=note/1=rest]
   const FOLK_NOTES = [
-    // Phrase 1 — "Mẹ-ta  mẹ-ta"
-    [587.33, 0.5], [659.26, 0.5], [587.33, 0.5], [659.26, 0.5],
-    // Phrase 2 — "l'o-re  o"
-    [783.99, 0.5], [659.26, 0.5], [587.33, 1.0],
-    // Phrase 3 — variation
-    [493.88, 0.5], [587.33, 0.5], [659.26, 0.5], [783.99, 0.5],
-    // Phrase 4 — cadence
-    [659.26, 0.5], [587.33, 0.5], [493.88, 0.5], [391.99, 0.5],
-    // Phrase 5 — resolution
-    [391.99, 0.5], [440.00, 0.5], [493.88, 1.0],
-    // Brief rest
-    [391.99, 2.0],
+    // Phrase 1 — "Mẹ-ta mẹ-ta"
+    [349.23, 1.0],   // F4
+    [277.18, 1.0],   // Db4
+    [220.00, 1.5],   // A3
+    // Phrase 2 — "l'o-re o"
+    [311.13, 2.0],   // Eb4
+    [293.66, 1.0],   // D4
+    [207.65, 1.5],   // Ab3
+    // Phrase 3 — "Mẹ-ta l'ore" (variation)
+    [261.63, 1.0],   // C4
+    [196.00, 0.5],   // G3
+    [261.63, 1.5],   // C4
+    [246.94, 1.5],   // B3
+    // Phrase 4 — cadence "ore o"
+    [277.18, 2.0],   // Db4
+    [329.63, 1.5],   // E4
+    [207.65, 1.0],   // Ab3
+    // Rest before repeat
+    [0,      2.5],   // silence
   ];
 
   let folkTimer   = null;
@@ -293,7 +302,7 @@ const SFX = (() => {
   let folkNextAt  = 0;
 
   function folkNote(freq, dur, at) {
-    if (muted) return;
+    if (muted || freq === 0) return; // 0 = rest, skip
     const c = getCtx();
     const sustain = dur * FOLK_BEAT * 0.72;
     const release = dur * FOLK_BEAT * 0.22;
