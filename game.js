@@ -156,6 +156,18 @@ document.addEventListener('visibilitychange', () => {
   if (document.visibilityState === 'visible') requestWakeLock();
 });
 
+// ── Folk melody (real audio file) ──
+const _melody = new Audio('./meta-melody.mp4');
+_melody.loop = true;
+_melody.volume = 0.55;
+function melodyPlay() {
+  if (!SFX.isMuted()) _melody.play().catch(() => {});
+}
+function melodyStop() {
+  _melody.pause();
+  _melody.currentTime = 0;
+}
+
 // ── Screen orientation lock ──
 function lockPortrait() {
   try {
@@ -196,8 +208,8 @@ function init() {
   updateStatsDisplay();
   refreshTitleScreen();
   showScreen('title-screen');
-  // Start folk melody on first user interaction (required by browsers)
-  // folk melody disabled — will revisit later
+  // Start folk melody on first user interaction (browsers require gesture)
+  document.addEventListener('click', () => { melodyPlay(); }, { once: true });
 }
 
 function refreshTitleScreen() {
@@ -530,7 +542,7 @@ function showScreen(id) {
 function goToMenu() {
   refreshTitleScreen();
   showScreen('title-screen');
-  // folk melody disabled — will revisit later
+  melodyPlay();
   // Re-show install banner if prompt is still available
   const banner = document.getElementById('install-banner');
   if (banner && _installPrompt) banner.classList.remove('hidden');
@@ -571,7 +583,7 @@ function startGame() {
   setHeader(is2p ? '2 Players' : TITLES[titleIdx].name, is2p ? 'Player 1\'s turn' : 'Your turn – tap a pit');
   showScreen('game-screen');
   highlightValidMoves();
-  // folk melody disabled — will revisit later
+  melodyStop();
   SFX.ambientStart();
 }
 
