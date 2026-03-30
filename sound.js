@@ -281,22 +281,22 @@ const SFX = (() => {
     [493.88, 0.5],  // B4  tà   (high)
     [440.00, 0.5],  // A4  mẹ́  (medium)
     [493.88, 0.5],  // B4  tà   (high)
-    [587.33, 0.5],  // D5  lọ́  (higher)
-    [493.88, 0.5],  // B4  rẹ́  (fall back)
-    [392.00, 1.5],  // G4  o    (held low)
+    [440.00, 0.5],  // A4  lọ́  (medium)
+    [493.88, 0.5],  // B4  rẹ́  (high)
+    [587.33, 2.0],  // D5  o    (high, stretched)
     // Response: "Èèè"
-    [349.23, 2.0],  // F4  Èèè (long, settling)
+    [392.00, 2.0],  // G4  Èèè (long, settling)
     [0,      0.5],  // breath
     // Call repeat
     [440.00, 0.5],  // A4  Mẹ́
     [493.88, 0.5],  // B4  tà
     [440.00, 0.5],  // A4  mẹ́
     [493.88, 0.5],  // B4  tà
-    [587.33, 0.5],  // D5  lọ́
+    [440.00, 0.5],  // A4  lọ́
     [493.88, 0.5],  // B4  rẹ́
-    [392.00, 1.5],  // G4  o    (held)
+    [587.33, 2.0],  // D5  o    (high, stretched)
     // Response: "Èèè"
-    [349.23, 2.5],  // F4  Èèè (slightly longer at end of phrase)
+    [392.00, 2.5],  // G4  Èèè (slightly longer at end of phrase)
     // Rest before loop
     [0,      2.0],
   ];
