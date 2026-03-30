@@ -101,7 +101,8 @@ body { width:100%; height:100%; height:100dvh; overflow:hidden; background:var(-
 /* ── TITLE SCREEN ─────────────────────────────────── */
 .title-body {
   display:flex; flex-direction:column; align-items:center; gap:14px;
-  padding:90px 24px; width:100%; z-index:1;
+  padding:90px 24px 100px; width:100%; z-index:1;
+  overflow-y:auto; overflow-x:hidden;
 }
 
 .crown-float { font-size:52px; animation:float 3s ease-in-out infinite; }
@@ -234,8 +235,10 @@ button:active { transform:translateY(0); }
 /* Wood theme picker */
 .wood-btns { display:flex; gap:8px; align-items:center; }
 .wood-btn {
-  width:28px; height:28px; border-radius:50%; border:2px solid rgba(106,60,24,.4);
+  width:28px; height:28px; min-width:28px; min-height:28px;
+  border-radius:50%; border:2px solid rgba(30,90,50,.4);
   cursor:pointer; transition:border-color .2s, transform .15s; flex-shrink:0;
+  padding:0; aspect-ratio:1;
 }
 .wood-btn:hover { transform:scale(1.15); }
 .wood-btn.active { border-color:var(--gold); box-shadow:0 0 8px rgba(201,148,30,.6); }
