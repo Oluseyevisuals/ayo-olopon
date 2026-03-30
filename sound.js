@@ -312,33 +312,42 @@ const SFX = (() => {
   function folkNote(freq, dur, at) {
     if (muted || freq === 0) return; // 0 = rest, skip
     const c = getCtx();
-    const sustain = dur * FOLK_BEAT * 0.72;
-    const release = dur * FOLK_BEAT * 0.22;
+    const sustain = dur * FOLK_BEAT * 0.74;
+    const release = dur * FOLK_BEAT * 0.20;
     const end     = at + sustain + release;
 
-    // ── Flute timbre ─────────────────────────────────────────────
-    // Sine wave with gentle vibrato — warm, breathy flute character
+    // ── Saxophone timbre ─────────────────────────────────────────
+    // Sawtooth base (rich odd+even harmonics like a reed instrument)
+    // + lowpass filter to round off harsh highs
+    // + subtle vibrato for expressiveness
     const osc  = c.createOscillator();
-    osc.type = 'sine';
+    osc.type = 'sawtooth';
     osc.frequency.value = freq;
 
-    // Gentle vibrato
+    // Warm lowpass — cuts fizzy top end, leaves reedy body
+    const lp = c.createBiquadFilter();
+    lp.type = 'lowpass';
+    lp.frequency.value = freq * 4.5;
+    lp.Q.value = 1.2;
+
+    // Subtle vibrato (sax players use ~5 Hz, smaller depth than flute)
     const lfo     = c.createOscillator();
     const lfoGain = c.createGain();
     lfo.type = 'sine';
-    lfo.frequency.value = 5.2;
-    lfoGain.gain.value  = freq * 0.007;
+    lfo.frequency.value = 5.0;
+    lfoGain.gain.value  = freq * 0.004;
     lfo.connect(lfoGain);
     lfoGain.connect(osc.frequency);
 
-    // Soft breath attack
+    // Sax envelope: slightly punchy attack, full sustain, quick release
     const gain = c.createGain();
     gain.gain.setValueAtTime(0, at);
-    gain.gain.linearRampToValueAtTime(0.10, at + 0.06);
-    gain.gain.setValueAtTime(0.10, at + sustain);
+    gain.gain.linearRampToValueAtTime(0.13, at + 0.04);
+    gain.gain.setValueAtTime(0.13, at + sustain);
     gain.gain.exponentialRampToValueAtTime(0.001, end);
 
-    osc.connect(gain);
+    osc.connect(lp);
+    lp.connect(gain);
     gain.connect(c.destination);
 
     lfo.start(at); osc.start(at);
