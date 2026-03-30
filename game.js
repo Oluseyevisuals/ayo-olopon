@@ -196,6 +196,8 @@ function init() {
   updateStatsDisplay();
   refreshTitleScreen();
   showScreen('title-screen');
+  // Start folk melody on first user interaction (required by browsers)
+  document.addEventListener('click', () => SFX.folkMelodyStart(), { once: true });
 }
 
 function refreshTitleScreen() {
@@ -528,6 +530,7 @@ function showScreen(id) {
 function goToMenu() {
   refreshTitleScreen();
   showScreen('title-screen');
+  SFX.folkMelodyStart();
   // Re-show install banner if prompt is still available
   const banner = document.getElementById('install-banner');
   if (banner && _installPrompt) banner.classList.remove('hidden');
@@ -568,6 +571,7 @@ function startGame() {
   setHeader(is2p ? '2 Players' : TITLES[titleIdx].name, is2p ? 'Player 1\'s turn' : 'Your turn – tap a pit');
   showScreen('game-screen');
   highlightValidMoves();
+  SFX.folkMelodyStop();
   SFX.ambientStart();
 }
 

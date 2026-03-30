@@ -265,5 +265,90 @@ const SFX = (() => {
     if (drumTimer) { clearInterval(drumTimer); drumTimer = null; }
   }
 
-  return { select, sow, capture, win, lose, titleUnlock, toggleMute, isMuted, ambientStart, ambientStop };
+  // ── Mẹta mẹta l'ore o — folk melody loop ───────────────────────────
+  // Synthesised as a warm flute/kalimba voice over the drum loop.
+  // Uses G major pentatonic (G4·A4·B4·D5·E5·G5) — the natural scale
+  // of Yoruba folk music. Tempo: 88 BPM, gentle vibrato, soft attack.
+  const FOLK_BPM   = 88;
+  const FOLK_BEAT  = 60 / FOLK_BPM;               // ≈ 0.682 s per beat
+
+  // [frequency_hz, duration_in_beats]
+  const FOLK_NOTES = [
+    // Phrase 1 — "Mẹ-ta  mẹ-ta"
+    [587.33, 0.5], [659.26, 0.5], [587.33, 0.5], [659.26, 0.5],
+    // Phrase 2 — "l'o-re  o"
+    [783.99, 0.5], [659.26, 0.5], [587.33, 1.0],
+    // Phrase 3 — variation
+    [493.88, 0.5], [587.33, 0.5], [659.26, 0.5], [783.99, 0.5],
+    // Phrase 4 — cadence
+    [659.26, 0.5], [587.33, 0.5], [493.88, 0.5], [391.99, 0.5],
+    // Phrase 5 — resolution
+    [391.99, 0.5], [440.00, 0.5], [493.88, 1.0],
+    // Brief rest
+    [391.99, 2.0],
+  ];
+
+  let folkTimer   = null;
+  let folkNoteIdx = 0;
+  let folkNextAt  = 0;
+
+  function folkNote(freq, dur, at) {
+    if (muted) return;
+    const c = getCtx();
+    const sustain = dur * FOLK_BEAT * 0.72;
+    const release = dur * FOLK_BEAT * 0.22;
+
+    // Warm triangle oscillator — flute/vocal character
+    const osc  = c.createOscillator();
+    const gain = c.createGain();
+    osc.type = 'triangle';
+    osc.frequency.value = freq;
+
+    // Gentle vibrato (LFO → frequency)
+    const lfo     = c.createOscillator();
+    const lfoGain = c.createGain();
+    lfo.type = 'sine';
+    lfo.frequency.value = 5.2;
+    lfoGain.gain.value  = freq * 0.007;
+    lfo.connect(lfoGain);
+    lfoGain.connect(osc.frequency);
+
+    gain.gain.setValueAtTime(0, at);
+    gain.gain.linearRampToValueAtTime(0.09, at + 0.07);
+    gain.gain.setValueAtTime(0.09, at + sustain);
+    gain.gain.exponentialRampToValueAtTime(0.001, at + sustain + release);
+
+    osc.connect(gain);
+    gain.connect(c.destination);
+
+    lfo.start(at); osc.start(at);
+    lfo.stop(at + sustain + release + 0.05);
+    osc.stop(at + sustain + release + 0.05);
+  }
+
+  function folkTick() {
+    if (muted || !folkTimer) return;
+    const c = getCtx();
+    if (folkNextAt < c.currentTime + 0.05) folkNextAt = c.currentTime + 0.05;
+    // Schedule up to 1.5 s ahead
+    while (folkNextAt < c.currentTime + 1.5) {
+      const [freq, dur] = FOLK_NOTES[folkNoteIdx % FOLK_NOTES.length];
+      folkNote(freq, dur, folkNextAt);
+      folkNextAt += dur * FOLK_BEAT;
+      folkNoteIdx++;
+    }
+  }
+
+  function folkMelodyStart() {
+    if (folkTimer) return;
+    folkNoteIdx = 0; folkNextAt = 0;
+    folkTick();
+    folkTimer = setInterval(folkTick, 300);
+  }
+
+  function folkMelodyStop() {
+    if (folkTimer) { clearInterval(folkTimer); folkTimer = null; }
+  }
+
+  return { select, sow, capture, win, lose, titleUnlock, toggleMute, isMuted, ambientStart, ambientStop, folkMelodyStart, folkMelodyStop };
 })();
