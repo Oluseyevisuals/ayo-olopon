@@ -144,6 +144,10 @@ let isReplaying  = false;
 // Init
 // ────────────────────────────────────────────────────────────────────
 function init() {
+  // Remove intro splash after animation finishes (2.8s delay + 0.6s fade = 3.4s)
+  const splash = document.getElementById('intro-splash');
+  if (splash) setTimeout(() => splash.remove(), 3400);
+
   // Sync difficulty button active state from loaded value
   document.querySelectorAll('.diff-btn').forEach(b => b.classList.remove('active'));
   const dBtn = document.getElementById('diff-' + difficulty);

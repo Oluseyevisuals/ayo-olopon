@@ -1,3 +1,61 @@
+/* ── Intro Splash ─────────────────────────────────── */
+.intro-splash {
+  position:fixed; inset:0; z-index:999;
+  background:radial-gradient(ellipse at 50% 40%, #1a4428 0%, #0a1e12 50%, #071510 100%);
+  display:flex; align-items:center; justify-content:center;
+  animation:splash-out .6s ease-in forwards;
+  animation-delay:2.8s;
+  pointer-events:none;
+}
+.intro-inner {
+  display:flex; flex-direction:column; align-items:center; gap:10px;
+  animation:splash-rise .9s cubic-bezier(.22,.61,.36,1) forwards;
+}
+.intro-crown {
+  font-size:64px;
+  animation:crown-drop .7s cubic-bezier(.22,.61,.36,1) .1s both, crown-glow 1.5s ease-in-out .8s infinite;
+}
+@keyframes crown-drop {
+  from { transform:translateY(-40px) scale(.6); opacity:0; }
+  to   { transform:translateY(0)     scale(1);  opacity:1; }
+}
+@keyframes crown-glow {
+  0%,100% { filter:drop-shadow(0 0 8px rgba(201,148,30,.4)); }
+  50%     { filter:drop-shadow(0 0 24px rgba(201,148,30,.9)); }
+}
+.intro-welcome {
+  font-family:'Cinzel',serif; font-size:clamp(2.4rem,10vw,3.4rem);
+  font-weight:700; color:var(--gold-lt); letter-spacing:6px;
+  text-shadow:0 0 40px rgba(201,148,30,.6), 0 2px 8px rgba(0,0,0,.6);
+  animation:welcome-fade .8s ease .3s both;
+}
+.intro-sub {
+  font-size:.85rem; color:var(--dim); letter-spacing:5px; text-transform:uppercase;
+  animation:welcome-fade .8s ease .6s both;
+}
+.intro-line {
+  width:80px; height:1px;
+  background:linear-gradient(90deg,transparent,var(--gold),transparent);
+  animation:welcome-fade .8s ease .8s both;
+}
+.intro-title {
+  font-family:'Cinzel',serif; font-size:.85rem; color:rgba(201,148,30,.5);
+  letter-spacing:4px; text-transform:uppercase;
+  animation:welcome-fade .8s ease 1s both;
+}
+@keyframes welcome-fade {
+  from { opacity:0; transform:translateY(10px); }
+  to   { opacity:1; transform:translateY(0); }
+}
+@keyframes splash-rise {
+  from { opacity:0; transform:scale(.92); }
+  to   { opacity:1; transform:scale(1); }
+}
+@keyframes splash-out {
+  from { opacity:1; transform:scale(1); }
+  to   { opacity:0; transform:scale(1.04); pointer-events:none; }
+}
+
 /* ── Reset & Base ─────────────────────────────────── */
 *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
 
