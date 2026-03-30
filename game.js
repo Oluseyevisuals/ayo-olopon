@@ -197,7 +197,7 @@ function init() {
   refreshTitleScreen();
   showScreen('title-screen');
   // Start folk melody on first user interaction (required by browsers)
-  document.addEventListener('click', () => { SFX.folkMelodyStop(); startFolkAudio(); }, { once: true });
+  document.addEventListener('click', () => { SFX.folkMelodyStart(); }, { once: true });
 }
 
 function refreshTitleScreen() {
@@ -527,26 +527,10 @@ function showScreen(id) {
   document.getElementById(id).classList.remove('hidden');
 }
 
-// ── Folk melody audio player ──────────────────────────────────────
-let _folkAudio = null;
-function startFolkAudio() {
-  if (SFX.isMuted()) return;
-  if (!_folkAudio) {
-    _folkAudio = new Audio('meta-meta.mp4');
-    _folkAudio.loop = true;
-    _folkAudio.volume = 0.35;
-  }
-  _folkAudio.play().catch(() => {});
-}
-function stopFolkAudio() {
-  if (_folkAudio) { _folkAudio.pause(); _folkAudio.currentTime = 0; }
-}
-
 function goToMenu() {
   refreshTitleScreen();
   showScreen('title-screen');
-  SFX.folkMelodyStop();
-  startFolkAudio();
+  SFX.folkMelodyStart();
   // Re-show install banner if prompt is still available
   const banner = document.getElementById('install-banner');
   if (banner && _installPrompt) banner.classList.remove('hidden');
@@ -588,7 +572,6 @@ function startGame() {
   showScreen('game-screen');
   highlightValidMoves();
   SFX.folkMelodyStop();
-  stopFolkAudio();
   SFX.ambientStart();
 }
 
