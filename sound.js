@@ -269,35 +269,36 @@ const SFX = (() => {
   // Synthesised as a warm flute/kalimba voice over the drum loop.
   // Uses G major pentatonic (G4·A4·B4·D5·E5·G5) — the natural scale
   // of Yoruba folk music. Tempo: 88 BPM, gentle vibrato, soft attack.
-  const FOLK_BPM   = 108;
-  const FOLK_BEAT  = 60 / FOLK_BPM;               // ≈ 0.556 s per beat
+  const FOLK_BPM   = 104;
+  const FOLK_BEAT  = 60 / FOLK_BPM;               // ≈ 0.577 s per beat
 
-  // Mẹta mẹta l'ore o — syllable-mapped rhythm at 108 BPM
-  // Each entry maps to one syllable: [freq_hz, duration_in_beats]
-  // Scale: D natural minor pentatonic (D·F·G·A·C)
+  // Mẹ́tà mẹ́tà lọ́rẹ́ o — syllable-tone mapped to G pentatonic (G·A·B·D·E)
+  // Yoruba tone marks drive pitch: H(igh)=up, L(ow)=down, "Èèè"=long fall response
+  // [freq_hz, duration_in_beats]
   const FOLK_NOTES = [
-    // "Mẹ  - ta   mẹ  - ta"
-    [293.66, 0.5],  // D4  Mẹ
-    [261.63, 0.5],  // C4  ta
-    [293.66, 0.5],  // D4  mẹ
-    [261.63, 0.5],  // C4  ta
-    // "l'o  - re    o"
-    [349.23, 0.75], // F4  l'o
-    [329.63, 0.5],  // E4  re
-    [293.66, 1.5],  // D4  o  (held)
-    // "Mẹ  - ta   l'o  - re    o"
-    [261.63, 0.5],  // C4  Mẹ
-    [246.94, 0.5],  // B3  ta
-    [261.63, 0.5],  // C4  l'o
-    [220.00, 0.5],  // A3  re
-    [246.94, 1.5],  // B3  o  (held)
-    // cadence "o  - re    o"
-    [220.00, 0.5],  // A3
-    [261.63, 0.75], // C4
-    [293.66, 0.5],  // D4
-    [220.00, 2.0],  // A3  (final held)
-    // Rest before repeat
-    [0,      1.5],
+    // Call: "Mẹ́-tà  mẹ́-tà  lọ́-rẹ́  o"
+    [587.33, 0.5],  // D5  Mẹ́  (H)
+    [493.88, 0.5],  // B4  tà   (L)
+    [587.33, 0.5],  // D5  mẹ́  (H)
+    [493.88, 0.5],  // B4  tà   (L)
+    [659.26, 0.5],  // E5  lọ́  (H)
+    [587.33, 0.5],  // D5  rẹ́  (H falling)
+    [440.00, 1.5],  // A4  o    (held mid)
+    // Response: "Èèè"
+    [392.00, 2.0],  // G4  Èèè (long, low response)
+    [0,      0.5],  // breath
+    // Call repeat
+    [587.33, 0.5],  // D5  Mẹ́
+    [493.88, 0.5],  // B4  tà
+    [587.33, 0.5],  // D5  mẹ́
+    [493.88, 0.5],  // B4  tà
+    [659.26, 0.5],  // E5  lọ́
+    [587.33, 0.5],  // D5  rẹ́
+    [440.00, 1.5],  // A4  o    (held)
+    // Response: "Èèè"
+    [392.00, 2.5],  // G4  Èèè (slightly longer at end of phrase)
+    // Rest before loop
+    [0,      2.0],
   ];
 
   let folkTimer   = null;
