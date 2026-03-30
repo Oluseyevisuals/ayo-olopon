@@ -269,70 +269,40 @@ const SFX = (() => {
   // Synthesised as a warm flute/kalimba voice over the drum loop.
   // Uses G major pentatonic (G4·A4·B4·D5·E5·G5) — the natural scale
   // of Yoruba folk music. Tempo: 88 BPM, gentle vibrato, soft attack.
-  const FOLK_BPM   = 104;
-  const FOLK_BEAT  = 60 / FOLK_BPM;               // ≈ 0.577 s per beat
+  const FOLK_BPM   = 92;
+  const FOLK_BEAT  = 60 / FOLK_BPM;               // ≈ 0.652 s per beat
 
-  // Mẹ́tà mẹ́tà lọ́rẹ́ o — syllable-tone mapped to G pentatonic (G·A·B·D·E)
-  // Yoruba tone marks drive pitch: H(igh)=up, L(ow)=down, "Èèè"=long fall response
-  // [freq_hz, duration_in_beats]
+  // Mẹ́tà mẹ́tà lọ́rẹ́ o — derived from pitch analysis of vocal recording
+  // Voice range: A3/G3/F3 descending → B3 high jump
+  // Flute = 1 octave up. [freq_hz, duration_in_beats]
   const FOLK_NOTES = [
-    // ── Chorus x2: "Mẹ́tà mẹ́tà lọ́rẹ́ o, Èèè" ──────────────────────
-    [440.00, 0.5],  // A4  Mẹ́
-    [493.88, 0.5],  // B4  tà
-    [440.00, 0.5],  // A4  mẹ́
-    [493.88, 0.5],  // B4  tà
-    [440.00, 0.5],  // A4  lọ́
-    [493.88, 0.5],  // B4  rẹ́
-    [587.33, 2.0],  // D5  o    (high, stretched)
-    [392.00, 2.0],  // G4  Èèè
-    [0,      0.5],
-    [440.00, 0.5],  // A4  Mẹ́
-    [493.88, 0.5],  // B4  tà
-    [440.00, 0.5],  // A4  mẹ́
-    [493.88, 0.5],  // B4  tà
-    [440.00, 0.5],  // A4  lọ́
-    [493.88, 0.5],  // B4  rẹ́
-    [587.33, 2.0],  // D5  o
-    [392.00, 2.0],  // G4  Èèè
-    [0,      0.5],
+    // ── Chorus: "Mẹ́tà mẹ́tà lọ́rẹ́ o, Èèè" ─────────────────────────
+    // Each "Mẹ́tà" = medium(A4) → slightly lower(G4) = medium-high pair
+    [440.00, 0.75],  // A4  Mẹ́  (medium-high)
+    [392.00, 0.75],  // G4  tà
+    [440.00, 0.75],  // A4  mẹ́  (medium-high)
+    [392.00, 0.75],  // G4  tà
+    // "lọ́rẹ́" — same medium-high contour
+    [440.00, 0.75],  // A4  lọ́
+    [392.00, 0.75],  // G4  rẹ́
+    // "o" — jumps HIGH and stretches (B4, the peak note detected)
+    [493.88, 2.5],   // B4  o    (HIGH, long)
+    // "Èèè" — settles back down
+    [440.00, 0.75],  // A4  È
+    [392.00, 2.0],   // G4  èèè
+    [0,      0.75],  // breath
 
-    // ── Verse: "Ọ̀kan ni ń wà sùn lélẹ̀ ni, Èèè" (L-tones, lower register) ──
-    [392.00, 0.5],  // G4  Ọ̀   (low)
-    [440.00, 0.5],  // A4  kan  (mid)
-    [392.00, 0.5],  // G4  ni   (low)
-    [440.00, 0.5],  // A4  ń    (mid)
-    [392.00, 0.5],  // G4  wà   (low)
-    [392.00, 0.5],  // G4  sùn  (low)
-    [493.88, 0.5],  // B4  lé   (high)
-    [392.00, 0.5],  // G4  lẹ̀  (low)
-    [440.00, 1.0],  // A4  ni   (mid, held)
-    [349.23, 2.0],  // F4  Èèè  (settling low)
-    [0,      0.5],
-
-    // ── Verse 2: "Ọ̀kan ni ń wà sùn nílé, Èèè" ──
-    [392.00, 0.5],  // G4  Ọ̀
-    [440.00, 0.5],  // A4  kan
-    [392.00, 0.5],  // G4  ni
-    [440.00, 0.5],  // A4  ń
-    [392.00, 0.5],  // G4  wà
-    [392.00, 0.5],  // G4  sùn
-    [493.88, 0.5],  // B4  ní   (high)
-    [440.00, 1.0],  // A4  lé   (mid held)
-    [349.23, 2.0],  // F4  Èèè
-    [0,      0.5],
-
-    // ── Closing: "Yé ẹ̀yẹ o lọ́rẹ́ o, Èèè" ──
-    [493.88, 0.5],  // B4  Yé   (high)
-    [392.00, 0.5],  // G4  ẹ̀   (low)
-    [440.00, 0.5],  // A4  yẹ   (mid)
-    [587.33, 2.0],  // D5  o    (high, stretched)
-    [440.00, 0.5],  // A4  lọ́
-    [493.88, 0.5],  // B4  rẹ́
-    [587.33, 2.0],  // D5  o    (high, stretched)
-    [392.00, 2.5],  // G4  Èèè  (long settle)
-
-    // ── Rest before loop ──
-    [0,      2.0],
+    // ── Chorus repeat ────────────────────────────────────────────────
+    [440.00, 0.75],  // A4  Mẹ́
+    [392.00, 0.75],  // G4  tà
+    [440.00, 0.75],  // A4  mẹ́
+    [392.00, 0.75],  // G4  tà
+    [440.00, 0.75],  // A4  lọ́
+    [392.00, 0.75],  // G4  rẹ́
+    [493.88, 2.5],   // B4  o
+    [440.00, 0.75],  // A4  È
+    [392.00, 2.5],   // G4  èèè (slightly longer on repeat)
+    [0,      1.5],   // pause before loop
   ];
 
   let folkTimer   = null;
