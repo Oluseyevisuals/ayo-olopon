@@ -1,5 +1,5 @@
 // Ayo Olopon — Service Worker
-const CACHE = 'ayo-v2';
+const CACHE = 'ayo-v3';
 const LOCAL_ASSETS = [
   './',
   './index.html',
@@ -8,6 +8,7 @@ const LOCAL_ASSETS = [
   './sound.js',
   './manifest.json',
   './icon.svg',
+  './meta-meta.mp4',
   './bg_village.png',
   './bg_palace.png',
   './bg_throne.png',
