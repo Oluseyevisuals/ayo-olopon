@@ -312,47 +312,53 @@ const SFX = (() => {
   function folkNote(freq, dur, at) {
     if (muted || freq === 0) return; // 0 = rest, skip
     const c = getCtx();
-    const sustain = dur * FOLK_BEAT * 0.74;
-    const release = dur * FOLK_BEAT * 0.20;
-    const end     = at + sustain + release;
+    const sustain = dur * FOLK_BEAT * 0.70;
 
-    // ── Saxophone timbre ─────────────────────────────────────────
-    // Sawtooth base (rich odd+even harmonics like a reed instrument)
-    // + lowpass filter to round off harsh highs
-    // + subtle vibrato for expressiveness
-    const osc  = c.createOscillator();
-    osc.type = 'sawtooth';
-    osc.frequency.value = freq;
+    // ── Talking drum (dundun) — carries the melody ────────────────
+    // Sine wave with quick pitch drop on attack (the "talking" squeeze),
+    // then settles to the target pitch for the note duration.
+    const drum = c.createOscillator();
+    drum.type = 'sine';
+    drum.frequency.setValueAtTime(freq * 1.35, at);          // hit high
+    drum.frequency.exponentialRampToValueAtTime(freq, at + 0.06); // settle to pitch
 
-    // Warm lowpass — cuts fizzy top end, leaves reedy body
-    const lp = c.createBiquadFilter();
-    lp.type = 'lowpass';
-    lp.frequency.value = freq * 4.5;
-    lp.Q.value = 1.2;
+    const drumGain = c.createGain();
+    drumGain.gain.setValueAtTime(0.28, at);
+    drumGain.gain.exponentialRampToValueAtTime(0.12, at + 0.08);  // punchy attack
+    drumGain.gain.setValueAtTime(0.12, at + sustain * 0.6);
+    drumGain.gain.exponentialRampToValueAtTime(0.001, at + sustain);
 
-    // Subtle vibrato (sax players use ~5 Hz, smaller depth than flute)
-    const lfo     = c.createOscillator();
-    const lfoGain = c.createGain();
-    lfo.type = 'sine';
-    lfo.frequency.value = 5.0;
-    lfoGain.gain.value  = freq * 0.004;
-    lfo.connect(lfoGain);
-    lfoGain.connect(osc.frequency);
+    drum.connect(drumGain);
+    drumGain.connect(c.destination);
+    drum.start(at);
+    drum.stop(at + sustain + 0.05);
 
-    // Sax envelope: slightly punchy attack, full sustain, quick release
-    const gain = c.createGain();
-    gain.gain.setValueAtTime(0, at);
-    gain.gain.linearRampToValueAtTime(0.13, at + 0.04);
-    gain.gain.setValueAtTime(0.13, at + sustain);
-    gain.gain.exponentialRampToValueAtTime(0.001, end);
+    // ── Shekere — bead rattle on each beat ───────────────────────
+    // Noise burst through a high bandpass — rattling beads on a gourd.
+    // Plays a short scatter: one hit on the beat + a soft echo ~40ms later.
+    [0, 0.04].forEach(function(offset) {
+      const len = Math.floor(c.sampleRate * 0.07);
+      const buf = c.createBuffer(1, len, c.sampleRate);
+      const d   = buf.getChannelData(0);
+      for (let i = 0; i < len; i++) {
+        d[i] = (Math.random() * 2 - 1) * Math.exp(-i / (len * 0.25));
+      }
+      const src = c.createBufferSource();
+      src.buffer = buf;
 
-    osc.connect(lp);
-    lp.connect(gain);
-    gain.connect(c.destination);
+      const bp = c.createBiquadFilter();
+      bp.type = 'bandpass';
+      bp.frequency.value = 3800;
+      bp.Q.value = 1.8;
 
-    lfo.start(at); osc.start(at);
-    lfo.stop(end + 0.05);
-    osc.stop(end + 0.05);
+      const sg = c.createGain();
+      sg.gain.setValueAtTime(offset === 0 ? 0.07 : 0.035, at + offset);
+      sg.gain.exponentialRampToValueAtTime(0.001, at + offset + 0.07);
+
+      src.connect(bp); bp.connect(sg); sg.connect(c.destination);
+      src.start(at + offset);
+      src.stop(at + offset + 0.08);
+    });
   }
 
   function folkTick() {
