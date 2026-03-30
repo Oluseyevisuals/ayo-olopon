@@ -614,6 +614,7 @@ function showScreen(id) {
 }
 
 function goToMenu() {
+  SFX.ambientStop();
   refreshTitleScreen();
   showScreen('title-screen');
   melodyPlay();
