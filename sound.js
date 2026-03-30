@@ -277,26 +277,26 @@ const SFX = (() => {
   // [freq_hz, duration_in_beats]
   const FOLK_NOTES = [
     // Call: "Mẹ́-tà  mẹ́-tà  lọ́-rẹ́  o"
-    [587.33, 0.5],  // D5  Mẹ́  (H)
-    [493.88, 0.5],  // B4  tà   (L)
-    [587.33, 0.5],  // D5  mẹ́  (H)
-    [493.88, 0.5],  // B4  tà   (L)
-    [659.26, 0.5],  // E5  lọ́  (H)
-    [587.33, 0.5],  // D5  rẹ́  (H falling)
-    [440.00, 1.5],  // A4  o    (held mid)
+    [440.00, 0.5],  // A4  Mẹ́  (medium)
+    [493.88, 0.5],  // B4  tà   (high)
+    [440.00, 0.5],  // A4  mẹ́  (medium)
+    [493.88, 0.5],  // B4  tà   (high)
+    [587.33, 0.5],  // D5  lọ́  (higher)
+    [493.88, 0.5],  // B4  rẹ́  (fall back)
+    [392.00, 1.5],  // G4  o    (held low)
     // Response: "Èèè"
-    [392.00, 2.0],  // G4  Èèè (long, low response)
+    [349.23, 2.0],  // F4  Èèè (long, settling)
     [0,      0.5],  // breath
     // Call repeat
-    [587.33, 0.5],  // D5  Mẹ́
+    [440.00, 0.5],  // A4  Mẹ́
     [493.88, 0.5],  // B4  tà
-    [587.33, 0.5],  // D5  mẹ́
+    [440.00, 0.5],  // A4  mẹ́
     [493.88, 0.5],  // B4  tà
-    [659.26, 0.5],  // E5  lọ́
-    [587.33, 0.5],  // D5  rẹ́
-    [440.00, 1.5],  // A4  o    (held)
+    [587.33, 0.5],  // D5  lọ́
+    [493.88, 0.5],  // B4  rẹ́
+    [392.00, 1.5],  // G4  o    (held)
     // Response: "Èèè"
-    [392.00, 2.5],  // G4  Èèè (slightly longer at end of phrase)
+    [349.23, 2.5],  // F4  Èèè (slightly longer at end of phrase)
     // Rest before loop
     [0,      2.0],
   ];
