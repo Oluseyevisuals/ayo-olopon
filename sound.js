@@ -269,32 +269,35 @@ const SFX = (() => {
   // Synthesised as a warm flute/kalimba voice over the drum loop.
   // Uses G major pentatonic (G4·A4·B4·D5·E5·G5) — the natural scale
   // of Yoruba folk music. Tempo: 88 BPM, gentle vibrato, soft attack.
-  const FOLK_BPM   = 85;
-  const FOLK_BEAT  = 60 / FOLK_BPM;               // ≈ 0.706 s per beat
+  const FOLK_BPM   = 108;
+  const FOLK_BEAT  = 60 / FOLK_BPM;               // ≈ 0.556 s per beat
 
-  // Notes extracted from the original Mẹta mẹta l'ore o recording.
-  // Frequencies doubled one octave for a warm flute/kalimba timbre.
-  // [frequency_hz, duration_in_beats, 0=note/1=rest]
+  // Mẹta mẹta l'ore o — syllable-mapped rhythm at 108 BPM
+  // Each entry maps to one syllable: [freq_hz, duration_in_beats]
+  // Scale: D natural minor pentatonic (D·F·G·A·C)
   const FOLK_NOTES = [
-    // Phrase 1 — "Mẹ-ta mẹ-ta"
-    [349.23, 1.0],   // F4
-    [277.18, 1.0],   // Db4
-    [220.00, 1.5],   // A3
-    // Phrase 2 — "l'o-re o"
-    [311.13, 2.0],   // Eb4
-    [293.66, 1.0],   // D4
-    [207.65, 1.5],   // Ab3
-    // Phrase 3 — "Mẹ-ta l'ore" (variation)
-    [261.63, 1.0],   // C4
-    [196.00, 0.5],   // G3
-    [261.63, 1.5],   // C4
-    [246.94, 1.5],   // B3
-    // Phrase 4 — cadence "ore o"
-    [277.18, 2.0],   // Db4
-    [329.63, 1.5],   // E4
-    [207.65, 1.0],   // Ab3
+    // "Mẹ  - ta   mẹ  - ta"
+    [293.66, 0.5],  // D4  Mẹ
+    [261.63, 0.5],  // C4  ta
+    [293.66, 0.5],  // D4  mẹ
+    [261.63, 0.5],  // C4  ta
+    // "l'o  - re    o"
+    [349.23, 0.75], // F4  l'o
+    [329.63, 0.5],  // E4  re
+    [293.66, 1.5],  // D4  o  (held)
+    // "Mẹ  - ta   l'o  - re    o"
+    [261.63, 0.5],  // C4  Mẹ
+    [246.94, 0.5],  // B3  ta
+    [261.63, 0.5],  // C4  l'o
+    [220.00, 0.5],  // A3  re
+    [246.94, 1.5],  // B3  o  (held)
+    // cadence "o  - re    o"
+    [220.00, 0.5],  // A3
+    [261.63, 0.75], // C4
+    [293.66, 0.5],  // D4
+    [220.00, 2.0],  // A3  (final held)
     // Rest before repeat
-    [0,      2.5],   // silence
+    [0,      1.5],
   ];
 
   let folkTimer   = null;
