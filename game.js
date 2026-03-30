@@ -143,10 +143,50 @@ let isReplaying  = false;
 // ────────────────────────────────────────────────────────────────────
 // Init
 // ────────────────────────────────────────────────────────────────────
+// ── Wake Lock — keep screen awake during gameplay ──
+let wakeLock = null;
+async function requestWakeLock() {
+  try {
+    if ('wakeLock' in navigator) {
+      wakeLock = await navigator.wakeLock.request('screen');
+    }
+  } catch(e) {}
+}
+document.addEventListener('visibilitychange', () => {
+  if (document.visibilityState === 'visible') requestWakeLock();
+});
+
+// ── Screen orientation lock ──
+function lockPortrait() {
+  try {
+    screen.orientation?.lock?.('portrait').catch(()=>{});
+  } catch(e) {}
+}
+
+// ── Android back button ──
+function pushNavState(screenId) {
+  history.pushState({ screen: screenId }, '');
+}
+window.addEventListener('popstate', (e) => {
+  const current = document.querySelector('.screen:not(.hidden)');
+  if (current && current.id !== 'title-screen') {
+    goToMenu();
+  } else {
+    history.pushState({}, '');
+  }
+});
+
 function init() {
   // Remove intro splash after animation finishes (2.8s delay + 0.6s fade = 3.4s)
   const splash = document.getElementById('intro-splash');
   if (splash) setTimeout(() => splash.remove(), 3400);
+
+  // Wake lock + orientation
+  requestWakeLock();
+  lockPortrait();
+
+  // Push initial history state for Android back button
+  history.pushState({ screen: 'title-screen' }, '');
 
   // Sync difficulty button active state from loaded value
   document.querySelectorAll('.diff-btn').forEach(b => b.classList.remove('active'));

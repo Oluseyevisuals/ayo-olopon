@@ -551,3 +551,16 @@ kbd {
   .board { padding:10px 8px; }
   .board-mid-line { margin:5px 4px; }
 }
+
+/* ── Landscape lock overlay ───────────────────────── */
+@media (orientation:landscape) and (max-height:500px) {
+  #app::after {
+    content:'🔄 Please rotate your device';
+    position:fixed; inset:0; z-index:9999;
+    background:#071510;
+    display:flex; align-items:center; justify-content:center;
+    font-family:'Cinzel',serif; font-size:1rem;
+    color:var(--gold-lt); letter-spacing:2px;
+    text-align:center; padding:20px;
+  }
+}
