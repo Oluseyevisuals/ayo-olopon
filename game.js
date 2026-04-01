@@ -282,8 +282,8 @@ function init() {
   updateStatsDisplay();
   refreshTitleScreen();
   showScreen('title-screen');
-  // Start folk melody on first user interaction (browsers require gesture)
-  document.addEventListener('click', () => { melodyPlay(); }, { once: true });
+  // Folk melody disabled — pending enhancement
+  // document.addEventListener('click', () => { melodyPlay(); }, { once: true });
 }
 
 function refreshTitleScreen() {
@@ -617,7 +617,7 @@ function goToMenu() {
   SFX.ambientStop();
   refreshTitleScreen();
   showScreen('title-screen');
-  melodyPlay();
+  // melodyPlay(); // disabled — pending enhancement
   // Re-show install banner if prompt is still available
   const banner = document.getElementById('install-banner');
   if (banner && _installPrompt) banner.classList.remove('hidden');
