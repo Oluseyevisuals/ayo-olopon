@@ -1,0 +1,94 @@
+name: Build Android AAB
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install Bubblewrap
+        run: npm install -g @bubblewrap/cli
+
+      - name: Create TWA manifest
+        run: |
+          mkdir -p twa-build
+          cat > twa-build/twa-manifest.json << 'EOF'
+          {
+            "packageId": "com.oluseyevisuals.ayoolopon",
+            "host": "oluseyevisuals.github.io",
+            "name": "Ayo Olopon",
+            "launcherName": "Ayo",
+            "display": "standalone",
+            "orientation": "portrait",
+            "themeColor": "#c9941e",
+            "navigationColor": "#c9941e",
+            "navigationColorDark": "#071510",
+            "navigationDividerColor": "#c9941e",
+            "navigationDividerColorDark": "#071510",
+            "backgroundColor": "#071510",
+            "enableNotifications": false,
+            "startUrl": "/ayo-olopon/index.html",
+            "iconUrl": "https://oluseyevisuals.github.io/ayo-olopon/icon-512.png",
+            "maskableIconUrl": "https://oluseyevisuals.github.io/ayo-olopon/icon-512.png",
+            "monochromeIconUrl": "https://oluseyevisuals.github.io/ayo-olopon/icon-512.png",
+            "appVersion": "2.0",
+            "appVersionCode": 2,
+            "signingKey": {
+              "path": "android.keystore",
+              "alias": "android"
+            },
+            "splashScreenFadeOutDuration": 300,
+            "enableSiteSettingsShortcut": true,
+            "isChromeOSOnly": false,
+            "isMetaQuest": false,
+            "fullScopeUrl": "https://oluseyevisuals.github.io/ayo-olopon/",
+            "minSdkVersion": 19,
+            "webManifestUrl": "https://oluseyevisuals.github.io/ayo-olopon/manifest.json"
+          }
+          EOF
+
+      - name: Generate keystore
+        working-directory: twa-build
+        run: |
+          keytool -genkey -v \
+            -keystore android.keystore \
+            -alias android \
+            -keyalg RSA \
+            -keysize 2048 \
+            -validity 10000 \
+            -storepass android123 \
+            -keypass android123 \
+            -dname "CN=Olu, OU=Oluseyevisuals, O=Oluseyevisuals, L=London, ST=England, C=GB"
+
+      - name: Build AAB
+        working-directory: twa-build
+        run: |
+          bubblewrap build --skipPwaValidation 2>&1
+
+      - name: Upload AAB
+        uses: actions/upload-artifact@v4
+        with:
+          name: ayo-olopon-v2
+          path: twa-build/app-release-bundle.aab
+          if-no-files-found: warn
+
+      - name: Upload APK (for testing)
+        uses: actions/upload-artifact@v4
+        with:
+          name: ayo-olopon-v2-apk
+          path: twa-build/app-release-signed.apk
+          if-no-files-found: warn
