@@ -31,7 +31,9 @@ jobs:
           sdkmanager "build-tools;34.0.0" "platforms;android-34" "platform-tools" 2>&1 | tail -3
 
       - name: Install Bubblewrap core
-        run: npm install -g @bubblewrap/core @bubblewrap/cli
+        run: |
+          npm install -g @bubblewrap/cli
+          npm install @bubblewrap/core @bubblewrap/cli
 
       - name: Generate Android TWA project (non-interactive)
         run: |
