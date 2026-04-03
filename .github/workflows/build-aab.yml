@@ -18,12 +18,29 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: '22'
+
+      - name: Set up Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: Install Android build tools
+        run: |
+          sdkmanager "build-tools;34.0.0" "platforms;android-34" "platform-tools"
 
       - name: Install Bubblewrap
         run: npm install -g @bubblewrap/cli
 
-      - name: Create TWA manifest
+      - name: Configure Bubblewrap (skip prompts)
+        run: |
+          mkdir -p ~/.bubblewrap
+          cat > ~/.bubblewrap/config.json << EOF
+          {
+            "jdkPath": "$JAVA_HOME",
+            "androidSdkPath": "$ANDROID_SDK_ROOT"
+          }
+          EOF
+
+      - name: Create TWA project
         run: |
           mkdir -p twa-build
           cat > twa-build/twa-manifest.json << 'EOF'
@@ -76,17 +93,16 @@ jobs:
 
       - name: Build AAB
         working-directory: twa-build
-        run: |
-          bubblewrap build --skipPwaValidation 2>&1
+        run: bubblewrap build --skipPwaValidation
 
       - name: Upload AAB
         uses: actions/upload-artifact@v4
         with:
-          name: ayo-olopon-v2
+          name: ayo-olopon-v2-aab
           path: twa-build/app-release-bundle.aab
           if-no-files-found: warn
 
-      - name: Upload APK (for testing)
+      - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
           name: ayo-olopon-v2-apk
