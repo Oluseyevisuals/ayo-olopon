@@ -23,9 +23,10 @@ jobs:
       - name: Set up Android SDK
         uses: android-actions/setup-android@v3
 
-      - name: Install Android build tools
+      - name: Accept SDK licences and install build tools
         run: |
-          sdkmanager "build-tools;34.0.0" "platforms;android-34" "platform-tools"
+          yes | sdkmanager --licenses || true
+          yes | sdkmanager "build-tools;34.0.0" "platforms;android-34" "platform-tools"
 
       - name: Install Bubblewrap
         run: npm install -g @bubblewrap/cli
@@ -94,7 +95,7 @@ jobs:
       - name: Build AAB
         working-directory: twa-build
         run: |
-          bubblewrap build --skipPwaValidation \
+          echo -e "android123\nandroid123\n" | bubblewrap build --skipPwaValidation \
             --signingKeyPassphrase android123 \
             --signingKeyAliasPassphrase android123
 
