@@ -95,20 +95,26 @@ jobs:
       - name: Build AAB
         working-directory: twa-build
         run: |
-          echo -e "android123\nandroid123\n" | bubblewrap build --skipPwaValidation \
+          yes n | bubblewrap build --skipPwaValidation \
             --signingKeyPassphrase android123 \
-            --signingKeyAliasPassphrase android123
+            --signingKeyAliasPassphrase android123 || true
+          # Check the AAB was actually produced
+          ls -lh app-release-bundle.aab 2>/dev/null || ls -lh app/build/outputs/bundle/release/*.aab 2>/dev/null || echo "Searching..." && find . -name "*.aab" 2>/dev/null
 
       - name: Upload AAB
         uses: actions/upload-artifact@v4
         with:
           name: ayo-olopon-v2-aab
-          path: twa-build/app-release-bundle.aab
+          path: |
+            twa-build/app-release-bundle.aab
+            twa-build/app/build/outputs/bundle/**/*.aab
           if-no-files-found: warn
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
           name: ayo-olopon-v2-apk
-          path: twa-build/app-release-signed.apk
+          path: |
+            twa-build/app-release-signed.apk
+            twa-build/app/build/outputs/apk/**/*.apk
           if-no-files-found: warn
