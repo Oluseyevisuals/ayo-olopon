@@ -6,6 +6,7 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    timeout-minutes: 20
     steps:
       - uses: actions/checkout@v4
 
@@ -23,91 +24,59 @@ jobs:
       - name: Set up Android SDK
         uses: android-actions/setup-android@v3
 
-      - name: Accept SDK licences and install build tools
+      - name: Accept licences and install build tools
         run: |
           yes | sdkmanager --licenses || true
-          yes | sdkmanager "build-tools;34.0.0" "platforms;android-34" "platform-tools"
+          sdkmanager "build-tools;34.0.0" "platforms;android-34" "platform-tools" --no_https 2>&1 | tail -5
 
-      - name: Install Bubblewrap
-        run: npm install -g @bubblewrap/cli
+      - name: Install Bubblewrap core
+        run: npm install -g @bubblewrap/cli @bubblewrap/core
 
-      - name: Configure Bubblewrap (skip prompts)
+      - name: Configure Bubblewrap
         run: |
           mkdir -p ~/.bubblewrap
-          cat > ~/.bubblewrap/config.json << EOF
-          {
-            "jdkPath": "$JAVA_HOME",
-            "androidSdkPath": "$ANDROID_SDK_ROOT"
-          }
-          EOF
+          echo "{\"jdkPath\":\"$JAVA_HOME\",\"androidSdkPath\":\"$ANDROID_SDK_ROOT\"}" > ~/.bubblewrap/config.json
+          cat ~/.bubblewrap/config.json
 
-      - name: Create TWA project
+      - name: Init TWA project (non-interactive)
         run: |
           mkdir -p twa-build
-          cat > twa-build/twa-manifest.json << 'EOF'
-          {
-            "packageId": "com.oluseyevisuals.ayoolopon",
-            "host": "oluseyevisuals.github.io",
-            "name": "Ayo Olopon",
-            "launcherName": "Ayo",
-            "display": "standalone",
-            "orientation": "portrait",
-            "themeColor": "#c9941e",
-            "navigationColor": "#c9941e",
-            "navigationColorDark": "#071510",
-            "navigationDividerColor": "#c9941e",
-            "navigationDividerColorDark": "#071510",
-            "backgroundColor": "#071510",
-            "enableNotifications": false,
-            "startUrl": "/ayo-olopon/index.html",
-            "iconUrl": "https://oluseyevisuals.github.io/ayo-olopon/icon-512.png",
-            "maskableIconUrl": "https://oluseyevisuals.github.io/ayo-olopon/icon-512.png",
-            "monochromeIconUrl": "https://oluseyevisuals.github.io/ayo-olopon/icon-512.png",
-            "appVersion": "2.0",
-            "appVersionCode": 2,
-            "signingKey": {
-              "path": "android.keystore",
-              "alias": "android"
-            },
-            "splashScreenFadeOutDuration": 300,
-            "enableSiteSettingsShortcut": true,
-            "isChromeOSOnly": false,
-            "isMetaQuest": false,
-            "fullScopeUrl": "https://oluseyevisuals.github.io/ayo-olopon/",
-            "minSdkVersion": 19,
-            "webManifestUrl": "https://oluseyevisuals.github.io/ayo-olopon/manifest.json"
-          }
-          EOF
+          cd twa-build
+          # Use bubblewrap init with manifest URL, answer all prompts with defaults
+          printf '\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n' | \
+            bubblewrap init \
+              --manifest "https://oluseyevisuals.github.io/ayo-olopon/manifest.json" \
+              --skipPwaValidation 2>&1 | tail -20
 
-      - name: Generate keystore
-        working-directory: twa-build
+      - name: Override version code to 2
         run: |
-          keytool -genkey -v \
-            -keystore android.keystore \
-            -alias android \
-            -keyalg RSA \
-            -keysize 2048 \
-            -validity 10000 \
-            -storepass android123 \
-            -keypass android123 \
-            -dname "CN=Olu, OU=Oluseyevisuals, O=Oluseyevisuals, L=London, ST=England, C=GB"
+          cd twa-build
+          # Set version code in twa-manifest.json
+          node -e "
+            const fs = require('fs');
+            const m = JSON.parse(fs.readFileSync('twa-manifest.json','utf8'));
+            m.appVersionCode = 2;
+            m.appVersion = '2.0';
+            fs.writeFileSync('twa-manifest.json', JSON.stringify(m, null, 2));
+            console.log('Version set to', m.appVersion, 'code', m.appVersionCode);
+          "
 
       - name: Build AAB
-        working-directory: twa-build
         run: |
-          yes n | bubblewrap build --skipPwaValidation \
-            --signingKeyPassphrase android123 \
-            --signingKeyAliasPassphrase android123 || true
-          # Check the AAB was actually produced
-          ls -lh app-release-bundle.aab 2>/dev/null || ls -lh app/build/outputs/bundle/release/*.aab 2>/dev/null || echo "Searching..." && find . -name "*.aab" 2>/dev/null
+          cd twa-build
+          bubblewrap build \
+            --skipPwaValidation \
+            --signingKeyPassphrase android \
+            --signingKeyAliasPassphrase android 2>&1
+          echo "--- searching for output files ---"
+          find . -name "*.aab" -o -name "*.apk" 2>/dev/null | head -20
 
       - name: Upload AAB
         uses: actions/upload-artifact@v4
         with:
           name: ayo-olopon-v2-aab
           path: |
-            twa-build/app-release-bundle.aab
-            twa-build/app/build/outputs/bundle/**/*.aab
+            twa-build/**/*.aab
           if-no-files-found: warn
 
       - name: Upload APK
@@ -115,6 +84,5 @@ jobs:
         with:
           name: ayo-olopon-v2-apk
           path: |
-            twa-build/app-release-signed.apk
-            twa-build/app/build/outputs/apk/**/*.apk
+            twa-build/**/*.apk
           if-no-files-found: warn
