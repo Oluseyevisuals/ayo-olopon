@@ -39,11 +39,11 @@ jobs:
         run: |
           mkdir -p twa-build
           cat > generate.js << 'JSEOF'
-          const {TwaManifest, TwaGenerator, Config, Log} = require('@bubblewrap/core');
+          const {TwaManifest, TwaGenerator, Config, ConsoleLog} = require('@bubblewrap/core');
           const path = require('path');
 
           async function run() {
-            const log = new Log('generate');
+            const log = new ConsoleLog('generate');
             const config = new Config(process.env.JAVA_HOME, process.env.ANDROID_SDK_ROOT);
 
             const manifestJson = {
