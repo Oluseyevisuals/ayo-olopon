@@ -107,12 +107,25 @@ jobs:
           echo "--- searching all output files ---"
           find . -name "*.aab" -o -name "*.apk" 2>/dev/null
 
+      - name: Sign AAB with jarsigner
+        run: |
+          AAB=$(find twa-build -name "*.aab" | head -1)
+          echo "Found AAB: $AAB"
+          jarsigner -verbose \
+            -keystore twa-build/android.keystore \
+            -storepass android \
+            -keypass android \
+            -signedjar twa-build/app-release-signed.aab \
+            "$AAB" android
+          echo "Signed AAB created"
+          ls -lh twa-build/app-release-signed.aab
+
       - name: Collect output files
         run: |
           mkdir -p output
-          find twa-build -name "*.aab" -exec cp {} output/ \; 2>/dev/null || true
-          find twa-build -name "*.apk" -exec cp {} output/ \; 2>/dev/null || true
-          ls -lh output/ || echo "No files found in output"
+          cp twa-build/app-release-signed.aab output/ 2>/dev/null || \
+            find twa-build -name "*.aab" -exec cp {} output/ \; 2>/dev/null || true
+          ls -lh output/
 
       - name: Upload AAB
         uses: actions/upload-artifact@v4
