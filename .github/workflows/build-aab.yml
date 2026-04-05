@@ -35,9 +35,14 @@ jobs:
           npm install -g @bubblewrap/cli
           npm install @bubblewrap/core @bubblewrap/cli
 
-      - name: Generate Android TWA project (non-interactive)
+      - name: Restore original keystore
         run: |
           mkdir -p twa-build
+          echo "${{ secrets.KEYSTORE_BASE64 }}" | base64 -d > twa-build/signing.keystore
+          ls -lh twa-build/signing.keystore
+
+      - name: Generate Android TWA project (non-interactive)
+        run: |
           cat > generate.js << 'JSEOF'
           const {TwaManifest, TwaGenerator, Config, ConsoleLog} = require('@bubblewrap/core');
           const path = require('path');
@@ -45,6 +50,8 @@ jobs:
           async function run() {
             const log = new ConsoleLog('generate');
             const config = new Config(process.env.JAVA_HOME, process.env.ANDROID_SDK_ROOT);
+
+            const keystorePath = path.resolve('twa-build/signing.keystore');
 
             const manifestJson = {
               packageId: 'com.oluseyevisuals.ayoolopon',
@@ -65,7 +72,7 @@ jobs:
               maskableIconUrl: 'https://oluseyevisuals.github.io/ayo-olopon/icon-512.png',
               appVersion: '2.0',
               appVersionCode: 2,
-              signingKey: { path: path.resolve('twa-build/android.keystore'), alias: 'android' },
+              signingKey: { path: keystorePath, alias: 'my-key-alias' },
               splashScreenFadeOutDuration: 300,
               enableSiteSettingsShortcut: true,
               isChromeOSOnly: false,
@@ -87,48 +94,20 @@ jobs:
           JSEOF
           node generate.js
 
-      - name: Restore original keystore
-        run: |
-          echo "${{ secrets.KEYSTORE_BASE64 }}" | base64 -d > twa-build/signing.keystore
-          ls -lh twa-build/signing.keystore
-
-      - name: Check generated files
-        run: |
-          echo "=== twa-build contents ==="
-          ls -la twa-build/
-          echo "=== manifest files ==="
-          find twa-build -name "*.json" 2>/dev/null
-
-      - name: Update signing key in manifest
-        run: |
-          MANIFEST=$(find twa-build -name "twa-manifest.json" | head -1)
-          KEYSTORE_PATH="$(pwd)/twa-build/signing.keystore"
-          echo "Manifest: $MANIFEST"
-          echo "Keystore: $KEYSTORE_PATH"
-          cat > /tmp/update-manifest.js << JSEOF
-          const fs = require('fs');
-          const m = JSON.parse(fs.readFileSync(process.argv[1], 'utf8'));
-          m.signingKey = { path: process.argv[2], alias: 'my-key-alias' };
-          fs.writeFileSync(process.argv[1], JSON.stringify(m, null, 2));
-          console.log('Done. signingKey path:', m.signingKey.path);
-          JSEOF
-          node /tmp/update-manifest.js "$MANIFEST" "$KEYSTORE_PATH"
-
-      - name: Build AAB with Gradle (signed with original keystore)
+      - name: Build AAB with Gradle
         working-directory: twa-build
         run: |
           chmod +x gradlew
           ./gradlew bundleRelease \
             -PsigningKeyPassword=sc3JmrlTX8lG \
             -PsigningKeyAliasPassword=sc3JmrlTX8lG 2>&1 | tail -30
-          echo "--- searching all output files ---"
+          echo "--- output files ---"
           find . -name "*.aab" 2>/dev/null
 
       - name: Collect output files
         run: |
           mkdir -p output
-          cp twa-build/app-release-signed.aab output/ 2>/dev/null || \
-            find twa-build -name "*.aab" -exec cp {} output/ \; 2>/dev/null || true
+          find twa-build -name "*.aab" -exec cp {} output/ \; 2>/dev/null || true
           ls -lh output/
 
       - name: Upload AAB
