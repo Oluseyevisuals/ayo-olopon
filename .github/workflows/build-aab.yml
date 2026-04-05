@@ -87,38 +87,27 @@ jobs:
           JSEOF
           node generate.js
 
-      - name: Generate keystore
+      - name: Restore original keystore
         run: |
-          keytool -genkey -v \
-            -keystore twa-build/android.keystore \
-            -alias android \
-            -keyalg RSA -keysize 2048 -validity 10000 \
-            -storepass android \
-            -keypass android \
-            -dname "CN=Olu, OU=Oluseyevisuals, O=Oluseyevisuals, L=London, ST=England, C=GB"
+          echo "${{ secrets.KEYSTORE_BASE64 }}" | base64 -d > twa-build/signing.keystore
+          ls -lh twa-build/signing.keystore
 
-      - name: Build AAB with Gradle
+      - name: Build AAB with Gradle (signed with original keystore)
         run: |
           cd twa-build
           chmod +x gradlew
+          # Update twa-manifest to use the original keystore
+          node -e "
+            const fs = require('fs');
+            const m = JSON.parse(fs.readFileSync('twa-manifest.json','utf8'));
+            m.signingKey = { path: 'signing.keystore', alias: 'my-key-alias' };
+            fs.writeFileSync('twa-manifest.json', JSON.stringify(m, null, 2));
+          "
           ./gradlew bundleRelease \
-            -PsigningKeyPassword=android \
-            -PsigningKeyAliasPassword=android 2>&1 | tail -30
+            -PsigningKeyPassword=sc3JmrlTX8lG \
+            -PsigningKeyAliasPassword=sc3JmrlTX8lG 2>&1 | tail -30
           echo "--- searching all output files ---"
-          find . -name "*.aab" -o -name "*.apk" 2>/dev/null
-
-      - name: Sign AAB with jarsigner
-        run: |
-          AAB=$(find twa-build -name "*.aab" | head -1)
-          echo "Found AAB: $AAB"
-          jarsigner -verbose \
-            -keystore twa-build/android.keystore \
-            -storepass android \
-            -keypass android \
-            -signedjar twa-build/app-release-signed.aab \
-            "$AAB" android
-          echo "Signed AAB created"
-          ls -lh twa-build/app-release-signed.aab
+          find . -name "*.aab" 2>/dev/null
 
       - name: Collect output files
         run: |
