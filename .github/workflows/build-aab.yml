@@ -92,23 +92,21 @@ jobs:
           echo "${{ secrets.KEYSTORE_BASE64 }}" | base64 -d > twa-build/signing.keystore
           ls -lh twa-build/signing.keystore
 
-      - name: Build AAB with Gradle (signed with original keystore)
+      - name: Update signing key in manifest
         run: |
-          cd twa-build
-          chmod +x gradlew
-          # Update twa-manifest to use the original keystore
           node -e "
             const fs = require('fs');
-            const m = JSON.parse(fs.readFileSync('twa-manifest.json','utf8'));
-            m.signingKey = { path: '../twa-build/signing.keystore', alias: 'my-key-alias' };
-            fs.writeFileSync('twa-manifest.json', JSON.stringify(m, null, 2));
-          " --input-type=module || node -e "
-            const fs = require('fs');
-            const m = JSON.parse(fs.readFileSync('./twa-manifest.json','utf8'));
-            m.signingKey = { path: process.cwd() + '/signing.keystore', alias: 'my-key-alias' };
-            fs.writeFileSync('./twa-manifest.json', JSON.stringify(m, null, 2));
-            console.log('Updated signingKey path to:', m.signingKey.path);
+            const p = 'twa-build/twa-manifest.json';
+            const m = JSON.parse(fs.readFileSync(p, 'utf8'));
+            m.signingKey = { path: process.cwd() + '/twa-build/signing.keystore', alias: 'my-key-alias' };
+            fs.writeFileSync(p, JSON.stringify(m, null, 2));
+            console.log('signingKey path set to:', m.signingKey.path);
           "
+
+      - name: Build AAB with Gradle (signed with original keystore)
+        working-directory: twa-build
+        run: |
+          chmod +x gradlew
           ./gradlew bundleRelease \
             -PsigningKeyPassword=sc3JmrlTX8lG \
             -PsigningKeyAliasPassword=sc3JmrlTX8lG 2>&1 | tail -30
