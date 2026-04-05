@@ -94,13 +94,28 @@ jobs:
           JSEOF
           node generate.js
 
+      - name: Inject signing config into build.gradle
+        run: |
+          KEYSTORE_PATH="$(pwd)/twa-build/signing.keystore"
+          cat >> twa-build/app/build.gradle << EOF
+
+          android.signingConfigs {
+            release {
+              storeFile file('$KEYSTORE_PATH')
+              storePassword 'sc3JmrlTX8lG'
+              keyAlias 'my-key-alias'
+              keyPassword 'sc3JmrlTX8lG'
+            }
+          }
+          android.buildTypes.release.signingConfig = android.signingConfigs.release
+          EOF
+          echo "build.gradle updated"
+
       - name: Build AAB with Gradle
         working-directory: twa-build
         run: |
           chmod +x gradlew
-          ./gradlew bundleRelease \
-            -PsigningKeyPassword=sc3JmrlTX8lG \
-            -PsigningKeyAliasPassword=sc3JmrlTX8lG 2>&1 | tail -30
+          ./gradlew bundleRelease 2>&1 | tail -30
           echo "--- output files ---"
           find . -name "*.aab" 2>/dev/null
 
