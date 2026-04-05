@@ -104,19 +104,19 @@ jobs:
           ./gradlew bundleRelease \
             -PsigningKeyPassword=android \
             -PsigningKeyAliasPassword=android 2>&1 | tail -30
-          echo "--- output files ---"
-          find . -name "*.aab" 2>/dev/null
+          echo "--- searching all output files ---"
+          find . -name "*.aab" -o -name "*.apk" 2>/dev/null
+
+      - name: Collect output files
+        run: |
+          mkdir -p output
+          find twa-build -name "*.aab" -exec cp {} output/ \; 2>/dev/null || true
+          find twa-build -name "*.apk" -exec cp {} output/ \; 2>/dev/null || true
+          ls -lh output/ || echo "No files found in output"
 
       - name: Upload AAB
         uses: actions/upload-artifact@v4
         with:
           name: ayo-olopon-v2-aab
-          path: twa-build/**/*.aab
-          if-no-files-found: warn
-
-      - name: Upload APK
-        uses: actions/upload-artifact@v4
-        with:
-          name: ayo-olopon-v2-apk
-          path: twa-build/**/*.apk
+          path: output/
           if-no-files-found: warn
