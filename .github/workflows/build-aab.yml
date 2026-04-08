@@ -70,8 +70,8 @@ jobs:
               startUrl: '/ayo-olopon/index.html',
               iconUrl: 'https://oluseyevisuals.github.io/ayo-olopon/icon-512.png',
               maskableIconUrl: 'https://oluseyevisuals.github.io/ayo-olopon/icon-512.png',
-              appVersion: '3.0',
-              appVersionCode: 3,
+              appVersion: '4.0',
+              appVersionCode: 4,
               signingKey: { path: keystorePath, alias: 'my-key-alias' },
               splashScreenFadeOutDuration: 300,
               enableSiteSettingsShortcut: true,
@@ -102,7 +102,9 @@ jobs:
       - name: Add AdMob App ID to AndroidManifest
         run: |
           sed -i 's|</application>|    <meta-data android:name="com.google.android.gms.ads.APPLICATION_ID" android:value="ca-app-pub-4833316065052048~9502679052"/>\n        </application>|' twa-build/app/src/main/AndroidManifest.xml
-          echo "AdMob App ID added to manifest"
+          sed -i 's|<manifest|<manifest\n    xmlns:android="http://schemas.android.com/apk/res/android"|' twa-build/app/src/main/AndroidManifest.xml || true
+          sed -i 's|</manifest>|    <uses-permission android:name="com.google.android.gms.permission.AD_ID"/>\n</manifest>|' twa-build/app/src/main/AndroidManifest.xml
+          echo "AdMob App ID and AD_ID permission added to manifest"
 
       - name: Create MainActivity with AdMob interstitial
         run: |
@@ -210,6 +212,6 @@ jobs:
       - name: Upload AAB
         uses: actions/upload-artifact@v4
         with:
-          name: ayo-olopon-v3-aab
+          name: ayo-olopon-v4-aab
           path: output/
           if-no-files-found: warn
