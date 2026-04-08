@@ -70,8 +70,8 @@ jobs:
               startUrl: '/ayo-olopon/index.html',
               iconUrl: 'https://oluseyevisuals.github.io/ayo-olopon/icon-512.png',
               maskableIconUrl: 'https://oluseyevisuals.github.io/ayo-olopon/icon-512.png',
-              appVersion: '2.0',
-              appVersionCode: 2,
+              appVersion: '3.0',
+              appVersionCode: 3,
               signingKey: { path: keystorePath, alias: 'my-key-alias' },
               splashScreenFadeOutDuration: 300,
               enableSiteSettingsShortcut: true,
@@ -93,6 +93,88 @@ jobs:
           run().catch(e => { console.error(e.message || e); process.exit(1); });
           JSEOF
           node generate.js
+
+      - name: Add AdMob SDK dependency
+        run: |
+          sed -i "s/dependencies {/dependencies {\n    implementation 'com.google.android.gms:play-services-ads:23.0.0'/" twa-build/app/build.gradle
+          echo "AdMob dependency added"
+
+      - name: Add AdMob App ID to AndroidManifest
+        run: |
+          sed -i 's|</application>|    <meta-data android:name="com.google.android.gms.ads.APPLICATION_ID" android:value="ca-app-pub-4833316065052048~9502679052"/>\n        </application>|' twa-build/app/src/main/AndroidManifest.xml
+          echo "AdMob App ID added to manifest"
+
+      - name: Create MainActivity with AdMob interstitial
+        run: |
+          mkdir -p twa-build/app/src/main/java/com/oluseyevisuals/ayoolopon
+          cat > twa-build/app/src/main/java/com/oluseyevisuals/ayoolopon/MainActivity.java << 'EOF'
+          package com.oluseyevisuals.ayoolopon;
+
+          import android.os.Bundle;
+          import androidx.annotation.NonNull;
+          import com.google.android.gms.ads.MobileAds;
+          import com.google.android.gms.ads.interstitial.InterstitialAd;
+          import com.google.android.gms.ads.interstitial.InterstitialAdLoadCallback;
+          import com.google.android.gms.ads.AdRequest;
+          import com.google.android.gms.ads.LoadAdError;
+          import com.google.android.gms.ads.FullScreenContentCallback;
+          import com.google.androidbrowserhelper.trusted.LauncherActivity;
+
+          public class MainActivity extends LauncherActivity {
+              private InterstitialAd mInterstitialAd;
+              private long sessionStartTime;
+              private boolean adShownThisSession = false;
+
+              @Override
+              protected void onCreate(Bundle savedInstanceState) {
+                  super.onCreate(savedInstanceState);
+                  sessionStartTime = System.currentTimeMillis();
+                  MobileAds.initialize(this, initializationStatus -> loadInterstitialAd());
+              }
+
+              private void loadInterstitialAd() {
+                  AdRequest adRequest = new AdRequest.Builder().build();
+                  InterstitialAd.load(this,
+                      "ca-app-pub-4833316065052048/4058780689",
+                      adRequest,
+                      new InterstitialAdLoadCallback() {
+                          @Override
+                          public void onAdLoaded(@NonNull InterstitialAd interstitialAd) {
+                              mInterstitialAd = interstitialAd;
+                          }
+                          @Override
+                          public void onAdFailedToLoad(@NonNull LoadAdError loadAdError) {
+                              mInterstitialAd = null;
+                          }
+                      });
+              }
+
+              @Override
+              protected void onResume() {
+                  super.onResume();
+                  long elapsed = System.currentTimeMillis() - sessionStartTime;
+                  // Show ad after 2 minutes of play, once per session
+                  if (!adShownThisSession && elapsed > 120000 && mInterstitialAd != null) {
+                      adShownThisSession = true;
+                      mInterstitialAd.setFullScreenContentCallback(new FullScreenContentCallback() {
+                          @Override
+                          public void onAdDismissedFullScreenContent() {
+                              mInterstitialAd = null;
+                              adShownThisSession = false;
+                              loadInterstitialAd();
+                          }
+                      });
+                      mInterstitialAd.show(this);
+                  }
+              }
+          }
+          EOF
+          echo "MainActivity.java created"
+
+      - name: Update AndroidManifest to use MainActivity
+        run: |
+          sed -i 's|com.google.androidbrowserhelper.trusted.LauncherActivity|com.oluseyevisuals.ayoolopon.MainActivity|g' twa-build/app/src/main/AndroidManifest.xml
+          echo "AndroidManifest updated to use MainActivity"
 
       - name: Inject signing config into build.gradle
         run: |
@@ -128,6 +210,6 @@ jobs:
       - name: Upload AAB
         uses: actions/upload-artifact@v4
         with:
-          name: ayo-olopon-v2-aab
+          name: ayo-olopon-v3-aab
           path: output/
           if-no-files-found: warn
