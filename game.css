@@ -345,7 +345,9 @@ h2 { font-family:'Cinzel',serif; font-size:1.35rem; color:var(--gold-lt); }
   border:2px solid var(--gold);
   box-shadow:0 8px 36px rgba(0,0,0,.7), inset 0 1px 0 rgba(255,255,255,.04);
 }
-.pit-row { display:grid; grid-template-columns:repeat(6,1fr); gap:8px; }
+.pit-row { display:grid; grid-template-columns:repeat(6,1fr); gap:8px; border-radius:12px; padding:6px; transition:box-shadow .3s, background .3s; }
+.pit-row.your-turn { background:rgba(201,148,30,.08); box-shadow:0 0 18px rgba(201,148,30,.25); animation:row-pulse 1.8s ease-in-out infinite; }
+@keyframes row-pulse { 0%,100%{ box-shadow:0 0 18px rgba(201,148,30,.25); } 50%{ box-shadow:0 0 28px rgba(201,148,30,.5); } }
 .board-mid-line {
   height:2px; background:linear-gradient(90deg,transparent,var(--pit-bdr),transparent);
   margin:8px 4px; position:relative; display:flex; align-items:center; justify-content:center;

@@ -460,7 +460,7 @@ function undoMove() {
     const p = turn === PLAYER ? 'Player 1' : 'Player 2';
     setHeader('2 Players', `${p}'s turn`);
   } else {
-    setHeader(TITLES[titleIdx].name, 'Your turn – tap a pit');
+    setHeader(TITLES[titleIdx].name, 'Oya, play! – tap a pit');
   }
 }
 
@@ -555,7 +555,7 @@ function replayLastMove() {
 
         const is2p = gameMode === '2p';
         const status = turn === PLAYER
-          ? (is2p ? 'Player 1\'s turn' : 'Your turn – tap a pit')
+          ? (is2p ? 'Player 1\'s turn' : 'Oya, play! – tap a pit')
           : (is2p ? 'Player 2\'s turn' : 'AI thinking…');
         setHeader(is2p ? '2 Players' : TITLES[titleIdx].name, status);
 
@@ -655,7 +655,7 @@ function startGame() {
   renderBoard();
   updateScores();
   updateBackground();
-  setHeader(is2p ? '2 Players' : TITLES[titleIdx].name, is2p ? 'Player 1\'s turn' : 'Your turn – tap a pit');
+  setHeader(is2p ? '2 Players' : TITLES[titleIdx].name, is2p ? 'Player 1\'s turn' : 'Oya, play! – tap a pit');
   showScreen('game-screen');
   highlightValidMoves();
   melodyStop();
@@ -740,6 +740,9 @@ function updateScores() {
 function setHeader(title, status) {
   document.getElementById('hdr-title').textContent  = title;
   document.getElementById('hdr-status').textContent = status;
+  const playerRow = document.getElementById('row-player');
+  const isYourTurn = status && (status.includes('Oya') || status.includes('Player 1'));
+  if (playerRow) playerRow.classList.toggle('your-turn', isYourTurn);
 }
 
 // ────────────────────────────────────────────────────────────────────
@@ -910,7 +913,7 @@ function doAITurn() {
     executeMove(move, OPPONENT, () => {
       if (!over) {
         turn = PLAYER;
-        setHeader(TITLES[titleIdx].name, 'Your turn – tap a pit');
+        setHeader(TITLES[titleIdx].name, 'Oya, play! – tap a pit');
         busy = false;
         enableUndo(); enableReplay();
         highlightValidMoves();
