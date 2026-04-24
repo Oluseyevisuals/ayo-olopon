@@ -135,6 +135,7 @@ let stores     = [0, 0];
 let turn       = PLAYER;
 let busy       = false;   // true while animation / AI thinking
 let over       = false;
+let noCaptureMoves = 0;   // consecutive moves without a capture
 let savedState   = null;    // snapshot for undo
 let canUndo      = false;
 let replayData   = null;    // { boardBefore, pitIdx, player }
@@ -633,13 +634,14 @@ function quitToMenu() {
 // Game start / reset
 // ────────────────────────────────────────────────────────────────────
 function startGame() {
-  board       = new Array(12).fill(4);
-  stores      = [0, 0];
-  turn        = PLAYER;
-  busy        = false;
-  over        = false;
-  savedState  = null;
-  canUndo     = false;
+  board          = new Array(12).fill(4);
+  stores         = [0, 0];
+  turn           = PLAYER;
+  busy           = false;
+  over           = false;
+  savedState     = null;
+  canUndo        = false;
+  noCaptureMoves = 0;
   replayData  = null;
   isReplaying = false;
 
@@ -994,6 +996,9 @@ function executeMove(pitIdx, player, onDone) {
 
     for (let i = 0; i < 12; i++) refreshPit(i);
     updateScores();
+    if (capturedPits.length > 0) noCaptureMoves = 0;
+    else noCaptureMoves++;
+    if (noCaptureMoves >= 20) { collectRemaining(turn); checkGameOver(true); return; }
     checkGameOver(false);
     if (onDone) onDone();
   }, captureDelay);
