@@ -1,30 +1,219 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
-  <rect width="512" height="512" rx="90" fill="#170b00"/>
-  <!-- Board -->
-  <rect x="64" y="196" width="384" height="160" rx="24" fill="#3b1c07" stroke="#c9941e" stroke-width="6"/>
-  <!-- 6 pits top row -->
-  <circle cx="108" cy="236" r="22" fill="#0d0400" stroke="#6a3c18" stroke-width="3"/>
-  <circle cx="172" cy="236" r="22" fill="#0d0400" stroke="#6a3c18" stroke-width="3"/>
-  <circle cx="236" cy="236" r="22" fill="#0d0400" stroke="#6a3c18" stroke-width="3"/>
-  <circle cx="300" cy="236" r="22" fill="#0d0400" stroke="#6a3c18" stroke-width="3"/>
-  <circle cx="364" cy="236" r="22" fill="#0d0400" stroke="#6a3c18" stroke-width="3"/>
-  <circle cx="428" cy="236" r="22" fill="#0d0400" stroke="#6a3c18" stroke-width="3"/>
-  <!-- 6 pits bottom row -->
-  <circle cx="108" cy="316" r="22" fill="#0d0400" stroke="#6a3c18" stroke-width="3"/>
-  <circle cx="172" cy="316" r="22" fill="#0d0400" stroke="#6a3c18" stroke-width="3"/>
-  <circle cx="236" cy="316" r="22" fill="#0d0400" stroke="#6a3c18" stroke-width="3"/>
-  <circle cx="300" cy="316" r="22" fill="#0d0400" stroke="#6a3c18" stroke-width="3"/>
-  <circle cx="364" cy="316" r="22" fill="#0d0400" stroke="#6a3c18" stroke-width="3"/>
-  <circle cx="428" cy="316" r="22" fill="#0d0400" stroke="#6a3c18" stroke-width="3"/>
-  <!-- Seeds (dots) in a few pits -->
-  <circle cx="108" cy="236" r="5" fill="#c9941e"/>
-  <circle cx="172" cy="236" r="5" fill="#c9941e"/>
-  <circle cx="300" cy="316" r="5" fill="#c9941e"/>
-  <!-- Crown above board -->
-  <polygon points="256,60 200,130 256,105 312,130" fill="#c9941e"/>
-  <rect x="188" y="128" width="136" height="28" rx="6" fill="#c9941e"/>
-  <!-- Crown gems -->
-  <circle cx="256" cy="72" r="8" fill="#f0b429"/>
-  <circle cx="200" cy="122" r="6" fill="#f0b429"/>
-  <circle cx="312" cy="122" r="6" fill="#f0b429"/>
+  <defs>
+    <radialGradient id="bg" cx="50%" cy="30%" r="80%">
+      <stop offset="0%"   stop-color="#1a2e0a"/>
+      <stop offset="55%"  stop-color="#0a1606"/>
+      <stop offset="100%" stop-color="#000400"/>
+    </radialGradient>
+    <radialGradient id="crownGlow" cx="50%" cy="50%" r="50%">
+      <stop offset="0%"   stop-color="#d4920a" stop-opacity="0.55"/>
+      <stop offset="100%" stop-color="#000"    stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="crownFill" x1="20%" y1="0%" x2="80%" y2="100%">
+      <stop offset="0%"   stop-color="#ffe566"/>
+      <stop offset="40%"  stop-color="#d4a010"/>
+      <stop offset="100%" stop-color="#7a5000"/>
+    </linearGradient>
+    <linearGradient id="crownBase" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%"   stop-color="#ffe566"/>
+      <stop offset="100%" stop-color="#b88010"/>
+    </linearGradient>
+    <linearGradient id="wood" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%"   stop-color="#8b4510"/>
+      <stop offset="40%"  stop-color="#5c2a08"/>
+      <stop offset="100%" stop-color="#2e1204"/>
+    </linearGradient>
+    <radialGradient id="pitInner" cx="35%" cy="30%" r="65%">
+      <stop offset="0%"   stop-color="#2a0e00"/>
+      <stop offset="100%" stop-color="#080200"/>
+    </radialGradient>
+    <radialGradient id="seedFill" cx="28%" cy="22%" r="68%">
+      <stop offset="0%"   stop-color="#fff0a0"/>
+      <stop offset="45%"  stop-color="#d4a010"/>
+      <stop offset="100%" stop-color="#6a3e00"/>
+    </radialGradient>
+    <filter id="crownBlur" x="-40%" y="-40%" width="180%" height="180%">
+      <feGaussianBlur stdDeviation="10" result="b"/>
+      <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+    <filter id="softBlur" x="-25%" y="-25%" width="150%" height="150%">
+      <feGaussianBlur stdDeviation="4" result="b"/>
+      <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+    <clipPath id="clip"><rect width="512" height="512" rx="100"/></clipPath>
+  </defs>
+
+  <g clip-path="url(#clip)">
+
+    <!-- ── Background ── -->
+    <rect width="512" height="512" fill="url(#bg)"/>
+
+    <!-- Background stars / sparkles -->
+    <circle cx="60"  cy="80"  r="2" fill="#ffd040" opacity="0.6"/>
+    <circle cx="140" cy="50"  r="1.5" fill="#ffd040" opacity="0.4"/>
+    <circle cx="380" cy="40"  r="2" fill="#ffd040" opacity="0.5"/>
+    <circle cx="460" cy="90"  r="1.5" fill="#ffd040" opacity="0.4"/>
+    <circle cx="30"  cy="200" r="1.5" fill="#ffd040" opacity="0.3"/>
+    <circle cx="490" cy="170" r="2" fill="#ffd040" opacity="0.4"/>
+    <circle cx="80"  cy="420" r="1.5" fill="#ffd040" opacity="0.25"/>
+    <circle cx="440" cy="430" r="1.5" fill="#ffd040" opacity="0.25"/>
+
+    <!-- Crown golden glow halo -->
+    <ellipse cx="256" cy="175" rx="200" ry="160" fill="url(#crownGlow)"/>
+
+    <!-- ── Kente accent top ── -->
+    <rect x="0" y="0" width="512" height="22" fill="#c9900a"/>
+    <rect x="0" y="0" width="512" height="7"  fill="#ffe040"/>
+    <rect x="0"   y="7" width="44" height="15" fill="#156030"/>
+    <rect x="88"  y="7" width="44" height="15" fill="#156030"/>
+    <rect x="176" y="7" width="44" height="15" fill="#156030"/>
+    <rect x="264" y="7" width="44" height="15" fill="#156030"/>
+    <rect x="352" y="7" width="44" height="15" fill="#156030"/>
+    <rect x="440" y="7" width="44" height="15" fill="#156030"/>
+
+    <!-- ── Kente accent bottom ── -->
+    <rect x="0" y="490" width="512" height="22" fill="#c9900a"/>
+    <rect x="0" y="505" width="512" height="7"  fill="#ffe040"/>
+    <rect x="0"   y="490" width="44" height="15" fill="#156030"/>
+    <rect x="88"  y="490" width="44" height="15" fill="#156030"/>
+    <rect x="176" y="490" width="44" height="15" fill="#156030"/>
+    <rect x="264" y="490" width="44" height="15" fill="#156030"/>
+    <rect x="352" y="490" width="44" height="15" fill="#156030"/>
+    <rect x="440" y="490" width="44" height="15" fill="#156030"/>
+
+    <!-- ── CROWN ── -->
+    <!-- Glow layer behind crown -->
+    <path d="M 108,212 L 108,158 L 160,186 L 198,118 L 228,154 L 256,38
+             L 284,154 L 314,118 L 352,186 L 404,158 L 404,212 Z"
+          fill="#ffd040" opacity="0.25" filter="url(#crownBlur)"/>
+
+    <!-- Crown main shape -->
+    <path d="M 108,212 L 108,158 L 160,186 L 198,118 L 228,154 L 256,38
+             L 284,154 L 314,118 L 352,186 L 404,158 L 404,212 Z"
+          fill="url(#crownFill)" stroke="#ffe566" stroke-width="2.5"
+          stroke-linejoin="round" filter="url(#softBlur)"/>
+
+    <!-- Crown inner highlight -->
+    <path d="M 128,205 L 128,168 L 168,190 L 204,134 L 232,162 L 256,68
+             L 280,162 L 308,134 L 344,190 L 384,168 L 384,205"
+          fill="none" stroke="#fff0a0" stroke-width="1.5" opacity="0.4"
+          stroke-linejoin="round"/>
+
+    <!-- Crown base rectangle -->
+    <rect x="100" y="207" width="312" height="44" rx="12" fill="url(#crownBase)"
+          stroke="#ffe566" stroke-width="2"/>
+    <!-- Crown base inner shine -->
+    <rect x="108" y="212" width="296" height="14" rx="6" fill="#fff0a0" opacity="0.3"/>
+    <!-- Crown base bottom line -->
+    <rect x="108" y="240" width="296" height="3" rx="1" fill="#7a5000" opacity="0.5"/>
+
+    <!-- Gems on crown -->
+    <!-- Top centre gem -->
+    <circle cx="256" cy="54"  r="14" fill="#cc2020" stroke="#ffe566" stroke-width="2.5"/>
+    <circle cx="250" cy="48"  r="5"  fill="#ff9090" opacity="0.8"/>
+    <circle cx="256" cy="54"  r="14" fill="none" stroke="#fff" stroke-width="1" opacity="0.3"/>
+
+    <!-- Left side gem -->
+    <circle cx="188" cy="128" r="10" fill="#1850c8" stroke="#ffe566" stroke-width="2"/>
+    <circle cx="184" cy="124" r="4"  fill="#90b8ff" opacity="0.8"/>
+
+    <!-- Right side gem -->
+    <circle cx="324" cy="128" r="10" fill="#18a040" stroke="#ffe566" stroke-width="2"/>
+    <circle cx="320" cy="124" r="4"  fill="#80ff90" opacity="0.8"/>
+
+    <!-- Small gems on base -->
+    <circle cx="180" cy="229" r="6" fill="#d4a010" stroke="#ffe566" stroke-width="1.5"/>
+    <circle cx="256" cy="229" r="6" fill="#cc2020" stroke="#ffe566" stroke-width="1.5"/>
+    <circle cx="332" cy="229" r="6" fill="#18a040" stroke="#ffe566" stroke-width="1.5"/>
+
+    <!-- ── BOARD ── -->
+    <!-- Board drop shadow -->
+    <rect x="50" y="268" width="412" height="140" rx="22" fill="#000" opacity="0.6"/>
+    <!-- Board body -->
+    <rect x="44" y="260" width="424" height="132" rx="20"
+          fill="url(#wood)" stroke="#d4900a" stroke-width="4"/>
+    <!-- Board inner edge -->
+    <rect x="54" y="270" width="404" height="112" rx="14"
+          fill="none" stroke="#f0c040" stroke-width="1.5" opacity="0.25"/>
+    <!-- Board centre divider -->
+    <rect x="64" y="326" width="384" height="3" rx="1" fill="#7a3808" opacity="0.7"/>
+
+    <!-- TOP ROW  y=296  x: 88,152,216,280,344,408 -->
+    <circle cx="88"  cy="296" r="23" fill="url(#pitInner)" stroke="#8b4818" stroke-width="2.5"/>
+    <circle cx="81"  cy="289" r="5.5" fill="url(#seedFill)"/>
+    <circle cx="95"  cy="289" r="5.5" fill="url(#seedFill)"/>
+    <circle cx="81"  cy="303" r="5.5" fill="url(#seedFill)"/>
+    <circle cx="95"  cy="303" r="5.5" fill="url(#seedFill)"/>
+
+    <circle cx="152" cy="296" r="23" fill="url(#pitInner)" stroke="#8b4818" stroke-width="2.5"/>
+    <circle cx="145" cy="290" r="5.5" fill="url(#seedFill)"/>
+    <circle cx="159" cy="290" r="5.5" fill="url(#seedFill)"/>
+    <circle cx="152" cy="303" r="5.5" fill="url(#seedFill)"/>
+
+    <circle cx="216" cy="296" r="23" fill="url(#pitInner)" stroke="#8b4818" stroke-width="2.5"/>
+    <circle cx="209" cy="289" r="5.5" fill="url(#seedFill)"/>
+    <circle cx="223" cy="289" r="5.5" fill="url(#seedFill)"/>
+    <circle cx="209" cy="303" r="5.5" fill="url(#seedFill)"/>
+    <circle cx="223" cy="303" r="5.5" fill="url(#seedFill)"/>
+
+    <circle cx="280" cy="296" r="23" fill="url(#pitInner)" stroke="#8b4818" stroke-width="2.5"/>
+    <circle cx="273" cy="290" r="5.5" fill="url(#seedFill)"/>
+    <circle cx="287" cy="290" r="5.5" fill="url(#seedFill)"/>
+    <circle cx="280" cy="303" r="5.5" fill="url(#seedFill)"/>
+
+    <circle cx="344" cy="296" r="23" fill="url(#pitInner)" stroke="#8b4818" stroke-width="2.5"/>
+    <circle cx="337" cy="289" r="5.5" fill="url(#seedFill)"/>
+    <circle cx="351" cy="289" r="5.5" fill="url(#seedFill)"/>
+    <circle cx="337" cy="303" r="5.5" fill="url(#seedFill)"/>
+    <circle cx="351" cy="303" r="5.5" fill="url(#seedFill)"/>
+
+    <circle cx="408" cy="296" r="23" fill="url(#pitInner)" stroke="#8b4818" stroke-width="2.5"/>
+    <circle cx="401" cy="290" r="5.5" fill="url(#seedFill)"/>
+    <circle cx="415" cy="290" r="5.5" fill="url(#seedFill)"/>
+    <circle cx="408" cy="303" r="5.5" fill="url(#seedFill)"/>
+
+    <!-- BOTTOM ROW  y=358 -->
+    <circle cx="88"  cy="358" r="23" fill="url(#pitInner)" stroke="#8b4818" stroke-width="2.5"/>
+    <circle cx="81"  cy="351" r="5.5" fill="url(#seedFill)"/>
+    <circle cx="95"  cy="351" r="5.5" fill="url(#seedFill)"/>
+    <circle cx="88"  cy="365" r="5.5" fill="url(#seedFill)"/>
+
+    <circle cx="152" cy="358" r="23" fill="url(#pitInner)" stroke="#8b4818" stroke-width="2.5"/>
+    <circle cx="145" cy="351" r="5.5" fill="url(#seedFill)"/>
+    <circle cx="159" cy="351" r="5.5" fill="url(#seedFill)"/>
+    <circle cx="145" cy="365" r="5.5" fill="url(#seedFill)"/>
+    <circle cx="159" cy="365" r="5.5" fill="url(#seedFill)"/>
+
+    <circle cx="216" cy="358" r="23" fill="url(#pitInner)" stroke="#8b4818" stroke-width="2.5"/>
+    <circle cx="209" cy="351" r="5.5" fill="url(#seedFill)"/>
+    <circle cx="223" cy="351" r="5.5" fill="url(#seedFill)"/>
+    <circle cx="216" cy="365" r="5.5" fill="url(#seedFill)"/>
+
+    <circle cx="280" cy="358" r="23" fill="url(#pitInner)" stroke="#8b4818" stroke-width="2.5"/>
+    <circle cx="273" cy="351" r="5.5" fill="url(#seedFill)"/>
+    <circle cx="287" cy="351" r="5.5" fill="url(#seedFill)"/>
+    <circle cx="273" cy="365" r="5.5" fill="url(#seedFill)"/>
+    <circle cx="287" cy="365" r="5.5" fill="url(#seedFill)"/>
+
+    <circle cx="344" cy="358" r="23" fill="url(#pitInner)" stroke="#8b4818" stroke-width="2.5"/>
+    <circle cx="337" cy="351" r="5.5" fill="url(#seedFill)"/>
+    <circle cx="351" cy="351" r="5.5" fill="url(#seedFill)"/>
+    <circle cx="344" cy="365" r="5.5" fill="url(#seedFill)"/>
+
+    <circle cx="408" cy="358" r="23" fill="url(#pitInner)" stroke="#8b4818" stroke-width="2.5"/>
+    <circle cx="401" cy="351" r="5.5" fill="url(#seedFill)"/>
+    <circle cx="415" cy="351" r="5.5" fill="url(#seedFill)"/>
+    <circle cx="401" cy="365" r="5.5" fill="url(#seedFill)"/>
+    <circle cx="415" cy="365" r="5.5" fill="url(#seedFill)"/>
+
+    <!-- ── TEXT (below board, board ends at y=392) ── -->
+    <text x="256" y="432" font-family="Georgia,serif" font-size="42" font-weight="bold"
+          text-anchor="middle" fill="#d4a010" letter-spacing="2" opacity="0.35"
+          filter="url(#softBlur)">AYO OLOPON</text>
+    <text x="256" y="432" font-family="Georgia,serif" font-size="42" font-weight="bold"
+          text-anchor="middle" fill="#f0c840" letter-spacing="2">AYO OLOPON</text>
+    <text x="256" y="462" font-family="Georgia,serif" font-size="15"
+          text-anchor="middle" fill="#8b6020" letter-spacing="3">YORUBA BOARD GAME</text>
+
+  </g>
 </svg>
