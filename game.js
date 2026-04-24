@@ -998,7 +998,8 @@ function executeMove(pitIdx, player, onDone) {
     updateScores();
     if (capturedPits.length > 0) noCaptureMoves = 0;
     else noCaptureMoves++;
-    if (noCaptureMoves >= 20) { collectRemaining(turn); checkGameOver(true); return; }
+    const totalBoardSeeds = board.reduce((a, b) => a + b, 0);
+    if (noCaptureMoves >= 20 && totalBoardSeeds <= 6) { collectRemaining(turn); checkGameOver(true); return; }
     checkGameOver(false);
     if (onDone) onDone();
   }, captureDelay);
