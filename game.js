@@ -497,7 +497,7 @@ function replayLastMove() {
   if (badge) badge.classList.remove('hidden');
   setHeader(
     gameMode === '2p' ? '2 Players' : TITLES[titleIdx].name,
-    player === PLAYER ? '▶ Replaying your move…' : '▶ Replaying AI move…'
+    player === PLAYER ? '▶ Replaying your move…' : '▶ Replaying Ota move…'
   );
 
   // Brief pause so player can see starting position, then animate
@@ -557,7 +557,7 @@ function replayLastMove() {
         const is2p = gameMode === '2p';
         const status = turn === PLAYER
           ? (is2p ? 'Player 1\'s turn' : 'Oya, play! – tap a pit')
-          : (is2p ? 'Player 2\'s turn' : 'AI thinking…');
+          : (is2p ? 'Player 2\'s turn' : 'Ota thinking…');
         setHeader(is2p ? '2 Players' : TITLES[titleIdx].name, status);
 
         isReplaying = false;
@@ -647,9 +647,9 @@ function startGame() {
 
   const is2p = gameMode === '2p';
   document.getElementById('lbl-player').textContent  = is2p ? 'P1' : 'You';
-  document.getElementById('lbl-opponent').textContent = is2p ? 'P2' : 'AI';
+  document.getElementById('lbl-opponent').textContent = is2p ? 'P2' : 'Ota';
   document.getElementById('fs-lbl-player').textContent = is2p ? 'P1' : 'You';
-  document.getElementById('fs-lbl-ai').textContent     = is2p ? 'P2' : 'AI';
+  document.getElementById('fs-lbl-ai').textContent     = is2p ? 'P2' : 'Ota';
   document.getElementById('btn-hint').style.display   = is2p ? 'none' : '';
   updateHintButton();
   document.getElementById('pit-labels').style.display = is2p ? 'none' : '';
@@ -866,7 +866,7 @@ function onPitClick(idx) {
       if (!over) {
         if (gameMode === 'ai') {
           turn = OPPONENT;
-          setHeader(TITLES[titleIdx].name, 'AI thinking…');
+          setHeader(TITLES[titleIdx].name, 'Ota thinking…');
           document.getElementById('hdr-status').classList.add('thinking');
           setTimeout(doAITurn, 600 + Math.random() * 400);
         } else {
