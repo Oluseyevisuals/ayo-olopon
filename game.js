@@ -4,6 +4,47 @@
 // Sowing: counter-clockwise → (i + 1) % 12
 // ─────────────────────────────────────────────────────────────────────
 
+// ── AdMob ─────────────────────────────────────────────────────────────
+const ADMOB_ID = {
+  android: 'ca-app-pub-4833316065052048/4058780689',
+  ios:     'ca-app-pub-4833316065052048/8027127429',
+};
+let adReady = false;
+
+async function initAdMob() {
+  if (!window.Capacitor || !window.Capacitor.isNativePlatform()) return;
+  const { AdMob } = window.Capacitor.Plugins;
+  if (!AdMob) return;
+  await AdMob.initialize();
+  await loadInterstitial();
+}
+
+async function loadInterstitial() {
+  if (!window.Capacitor || !window.Capacitor.isNativePlatform()) return;
+  const { AdMob } = window.Capacitor.Plugins;
+  if (!AdMob) return;
+  const platform = window.Capacitor.getPlatform();
+  const adId = platform === 'ios' ? ADMOB_ID.ios : ADMOB_ID.android;
+  try {
+    await AdMob.prepareInterstitial({ adId });
+    adReady = true;
+  } catch (e) {
+    adReady = false;
+  }
+}
+
+async function showInterstitialAd() {
+  if (!adReady || !window.Capacitor || !window.Capacitor.isNativePlatform()) return;
+  const { AdMob } = window.Capacitor.Plugins;
+  if (!AdMob) return;
+  try {
+    await AdMob.showInterstitial();
+  } catch (e) { /* ad not ready, continue */ }
+  adReady = false;
+  loadInterstitial();
+}
+// ──────────────────────────────────────────────────────────────────────
+
 const PLAYER   = 0;
 const OPPONENT = 1;
 
@@ -1141,7 +1182,9 @@ function finishGameOver() {
   if (tie) { /* no fanfare */ }
   else if (win) { SFX.win(); Haptic.win(); }
   else { SFX.lose(); Haptic.lose(); }
-  setTimeout(() => showGameOver(win, tie), tie ? 200 : 600);
+  showInterstitialAd().then(() => {
+    setTimeout(() => showGameOver(win, tie), tie ? 200 : 600);
+  });
 }
 
 function showGameOver(playerWon, tie) {
@@ -1609,3 +1652,4 @@ function dismissRate() {
 loadProgress();
 init();
 initDailyChallenge();
+initAdMob();
