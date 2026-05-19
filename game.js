@@ -631,7 +631,7 @@ function showHint() {
   if (hintPit === -1) return;
   document.querySelectorAll('.pit').forEach(p => p.classList.remove('hint-move'));
   const el = document.getElementById(`pit-${hintPit}`);
-  if (el) el.classList.add('hint-move');
+  if (el) { el.classList.add('hint-move'); SFX.hint(); }
 }
 
 function bestPlayerMove(depth) {
@@ -659,8 +659,7 @@ function goToMenu() {
   SFX.ambientStop();
   refreshTitleScreen();
   showScreen('title-screen');
-  // melodyPlay(); // disabled — pending enhancement
-  // Re-show install banner if prompt is still available
+  SFX.titleStart();
   const banner = document.getElementById('install-banner');
   if (banner && _installPrompt) banner.classList.remove('hidden');
 }
@@ -702,6 +701,7 @@ function startGame() {
   showScreen('game-screen');
   highlightValidMoves();
   melodyStop();
+  SFX.titleStop();
   SFX.ambientStart();
 }
 
